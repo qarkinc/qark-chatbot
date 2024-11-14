@@ -259,7 +259,7 @@ export function MultimodalInput({
 
       <Textarea
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder="Ask a Question..."
         value={input}
         onChange={handleInput}
         className={cx(

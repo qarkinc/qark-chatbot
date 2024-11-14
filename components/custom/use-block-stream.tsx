@@ -7,7 +7,7 @@ import { Suggestion } from '@/db/schema';
 import { UIBlock } from './block';
 
 type StreamingDelta = {
-  type: 'text-delta' | 'title' | 'id' | 'suggestion' | 'clear' | 'finish';
+  type: 'text-delta' | 'title' | 'id' | 'suggestion' | 'clear' | 'finish' | 'citation';
   content: string | Suggestion;
 };
 
@@ -33,6 +33,10 @@ export function useBlockStream({
 
   useEffect(() => {
     const mostRecentDelta = streamingData?.at(-1);
+    console.log('\nstreamingData: ');
+    console.log(streamingData);
+    console.log('mostRecentDelta: ');
+    console.log(mostRecentDelta);
     if (!mostRecentDelta) return;
 
     const delta = mostRecentDelta as StreamingDelta;
@@ -73,6 +77,19 @@ export function useBlockStream({
           }, 0);
 
           return draftBlock;
+
+          case 'citation':
+            console.log('\ncitation received: ');
+            console.log(delta.content);
+
+            // setTimeout(() => {
+            //   setOptimisticSuggestions((currentSuggestions) => [
+            //     ...currentSuggestions,
+            //     delta.content as Suggestion,
+            //   ]);
+            // }, 0);
+  
+            return draftBlock;
 
         case 'clear':
           return {
