@@ -44,6 +44,29 @@ export async function createUser(email: string, password: string) {
   }
 }
 
+export async function saveUserCredentials(user_id: string, { token_type, access_token, expires_in, scope: scopes }: {
+  access_token: string,
+  token_type: string,
+  expires_in: number
+  scope: Array<string>
+}) {
+
+  try {
+    return await db.update(user)
+    .set({
+      googleAccessToken: access_token,
+      accessTokenExpiry: new Date(expires_in),
+      googleTokenType: token_type,
+      scopes: scopes,
+    })
+    .where(eq(user.id, user_id))
+    .returning();
+  } catch (error) {
+    console.error('Failed to create user in database');
+    throw error;
+  }
+}
+
 export async function saveChat({
   id,
   userId,

@@ -9,12 +9,17 @@ import {
   primaryKey,
   foreignKey,
   boolean,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   email: varchar('email', { length: 64 }).notNull(),
   password: varchar('password', { length: 64 }),
+  googleAccessToken: varchar('googleAccessToken'),
+  googleTokenType: varchar('googleTokenType'),
+  accessTokenExpiry: timestamp('accessTokenExpiry', { mode: "date" }),
+  scopes: json("scopes")
 });
 
 export type User = InferSelectModel<typeof user>;
