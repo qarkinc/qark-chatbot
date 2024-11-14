@@ -1,0 +1,12 @@
+runtime: nodejs20
+
+instance_class: F4
+
+#env: flex  # Use the flexible environment for scaling
+
+service: default
+
+# Ensure all files are served
+handlers:
+  - url: /.*
+    script: auto
