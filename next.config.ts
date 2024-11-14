@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
         source: '/api/chat',
         destination: process.env.NODE_ENV === 'development'
             ? 'http://127.0.0.1:8000/api/chat'
-            : 'https://chat.qarkx.com/api/chat',
+            : 'https://api.qarkx.com/api/chat',
       },
     ]
   },
