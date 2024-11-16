@@ -11,12 +11,13 @@ import { Vote } from '@/db/schema';
 
 import { UIBlock } from './block';
 import { DocumentToolCall, DocumentToolResult } from './document';
-import { CrossIcon, SparklesIcon } from './icons';
+import { CrossIcon, LogoGMail, SparklesIcon } from './icons';
 import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
 import { Card, CardContent } from '../ui/card';
+
 
 export type QarkMessage = Message & {
   citations?: Array<any>
@@ -40,6 +41,7 @@ export const PreviewMessage = ({
   vote: Vote | undefined;
   isLoading: boolean;
 }) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
     <>
@@ -150,7 +152,7 @@ export const PreviewMessage = ({
                 if ((message.role === 'assistant' || message.role === 'system') && _citations && _citations.length > 0) {
                   return (
                     <>
-                      <h4 className='font-bold mt-3 text-2xl'>Sources:</h4>
+                      <h4 className='font-bold mt-3 text-xl'>Sources</h4>
                       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 select-none'>
                         {_citations.slice(0, 3).map((ele, idx) => {
                           if (String(ele.subject).length === 0) return null;
@@ -158,21 +160,22 @@ export const PreviewMessage = ({
                           const mailLink = `https://mail.google.com/mail/u/0/#all/${ele.message_id}`
                           return (
                             <Link href={mailLink} key={ele.message_id} target='_blank'>
-                              <Card className='p-4 size-full hover:border-primary hover:text-blue-400 bg-muted'>
-                                <span className='text-wrap'>
-                                  {String(ele.subject).substring(0, 25)}...
+                              <Card className='p-2 size-full hover:bg-muted-foreground/20 bg-muted'>
+                                <span className='text-sm'>
+                                  {String(ele.subject).substring(0, 30)}...
                                 </span>
+                                <div className="flex text-xs items-center gap-1">
+                                  <LogoGMail />
+                                  <span>gmail</span>
+                                </div>
                               </Card>
                             </Link>
                           )
                         })}
                         {_citations.length > 4 && (
                           <Dialog.Trigger asChild>
-                            <Card className='p-4 hover:border-primary hover:text-blue-400 bg-muted size-full rounded-lg cursor-pointer select-none'>
-                              <div className="flex flex-col">
-                                <span>View More</span>
-                                <span className='text-sm text-gray-400'>Remainings: {_citations.slice(4).length}</span>
-                              </div>
+                            <Card className='p-2 hover:bg-muted-foreground/20 bg-muted size-full rounded-lg cursor-pointer select-none'>
+                              <span>More Sources</span>
                             </Card>
                           </Dialog.Trigger>
                         )}
@@ -180,6 +183,7 @@ export const PreviewMessage = ({
                     </>
                   );
                 }
+
                 return null;
               })()}
 
@@ -196,20 +200,23 @@ export const PreviewMessage = ({
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50 w-full z-10" />
           <Dialog.Content className="fixed top-0 right-0 h-full w-1/3 bg-sidebar shadow-lg p-6 z-50 rounded-ss-lg rounded-es-lg">
-            <Dialog.Title className='mb-2'>Sources</Dialog.Title>
-            
+            <Dialog.Title className='mb-2'>Sourcees</Dialog.Title>
+
             {
               <div className='h-full overflow-y-auto'>
                 {Array.from(citations[message?.id] ?? []).map((ele) => {
-                  if (String(ele.subject).length === 0) return (<></>);
+                  if (String(ele.subject).trim().length === 0) return null;
 
                   const mailLink = `https://mail.google.com/mail/u/0/#all/${ele.message_id}`
                   return (
                     <Link href={mailLink} key={ele.message_id} target='_blank'>
-                      <Card className='p-4 w-full border-muted hover:border-primary hover:text-blue-400 bg-muted mb-4'>
-                        <span className='text-wrap'>
-                          {ele.subject}
-                        </span>
+                      <Card className='p-2 w-full border-muted hover:bg-muted-foreground/20 bg-muted mb-4'>
+
+                        <span>{ele.subject}</span>
+                        <div className="flex text-xs w-full items-center gap-1">
+                          <LogoGMail />
+                          <span>gmail</span>
+                        </div>
                       </Card>
                     </Link>
                   )
