@@ -24,14 +24,14 @@ import { Textarea } from '../ui/textarea';
 
 const suggestedActions = [
   {
-    title: 'What is the weather',
-    label: 'in San Francisco?',
-    action: 'What is the weather in San Francisco?',
+    title: 'What is my ',
+    label: 'schedule today?',
+    action: 'What is my schedule today?',
   },
   {
-    title: 'Help me draft an essay',
-    label: 'about Silicon Valley',
-    action: 'Help me draft a short essay about Silicon Valley',
+    title: 'What is my last',
+    label: 'Amazon order return?',
+    action: 'What is my last Amazon order return?',
   },
 ];
 

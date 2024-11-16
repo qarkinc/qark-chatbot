@@ -3,14 +3,14 @@
 import { Attachment, Message } from 'ai';
 import { useChat } from 'ai/react';
 import { AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { useWindowSize } from 'usehooks-ts';
 
 import { ChatHeader } from '@/components/custom/chat-header';
-import { PreviewMessage, ThinkingMessage } from '@/components/custom/message';
+import { PreviewMessage, QarkMessage, ThinkingMessage } from '@/components/custom/message';
 import { useScrollToBottom } from '@/components/custom/use-scroll-to-bottom';
-import { Vote } from '@/db/schema';
+import { User, Vote } from '@/db/schema';
 import { fetcher } from '@/lib/utils';
 
 import { Block, UIBlock } from './block';
@@ -22,10 +22,12 @@ export function Chat({
   id,
   initialMessages,
   selectedModelId,
+  // user
 }: {
   id: string;
   initialMessages: Array<Message>;
   selectedModelId: string;
+  // user?: User | null
 }) {
   const { mutate } = useSWRConfig();
 
@@ -42,6 +44,16 @@ export function Chat({
   } = useChat({
     body: { id, modelId: selectedModelId },
     initialMessages,
+    // TODO: Remove if we end up using server side oauth
+    // experimental_prepareRequestBody: (options) => {
+    //     return {
+    //       ...options.requestBody,
+    //       messages: options.messages,
+    //       requestBody: options.requestBody,
+    //       requestData: options.requestData,
+    //       "userToken": user?.googleAccessToken
+    //     } as any
+    // },
     onFinish: () => {
       mutate('/api/history');
     },
@@ -64,6 +76,8 @@ export function Chat({
     },
   });
 
+  const [citations, setCitations] = useState<{[key: string]: Array<any>}>({});
+
   const { data: votes } = useSWR<Array<Vote>>(
     `/api/vote?chatId=${id}`,
     fetcher
@@ -84,21 +98,25 @@ export function Chat({
         >
           {messages.length === 0 && <Overview />}
 
-          {messages.map((message, index) => (
-            <PreviewMessage
-              key={message.id}
-              chatId={id}
-              message={message}
-              block={block}
-              setBlock={setBlock}
-              isLoading={isLoading && messages.length - 1 === index}
-              vote={
-                votes
-                  ? votes.find((vote) => vote.messageId === message.id)
-                  : undefined
-              }
-            />
-          ))}
+          {messages.map((message, index) => {
+            return (
+              <PreviewMessage
+                key={message.id}
+                chatId={id}
+                message={{ ...message }}
+                block={block}
+                setBlock={setBlock}
+                citations={citations}
+                setCitations={setCitations}
+                isLoading={isLoading && messages.length - 1 === index}
+                vote={
+                  votes
+                    ? votes.find((vote) => vote.messageId === message.id)
+                    : undefined
+                }
+              />
+            )
+          })}
 
           {isLoading &&
             messages.length > 0 &&
@@ -144,12 +162,14 @@ export function Chat({
             setBlock={setBlock}
             messages={messages}
             setMessages={setMessages}
+            citations={citations}
+            setCitations={setCitations}
             votes={votes}
           />
         )}
       </AnimatePresence>
 
-      <BlockStreamHandler streamingData={streamingData} setBlock={setBlock} />
+      <BlockStreamHandler streamingData={streamingData} setBlock={setBlock} setCitations={setCitations} setMessages={setMessages} />
     </>
   );
 }

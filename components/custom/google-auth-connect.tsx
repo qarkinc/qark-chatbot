@@ -21,10 +21,8 @@ export default function GoogleAuthContent({
 
     const { state, access_token: token } = params; // Retrieve state and token from parsed params
     const savedState = localStorage.getItem("generated_uuid"); // Retrieve the stored state
-    console.log(savedState);
-    console.log(params);
-    
-
+    // console.log(savedState);
+    // console.log(params);
     // Check if savedState is missing
     if (!savedState) {
       setStatusMessage("Authorization state not found. Redirecting to the homepage...");

@@ -59,6 +59,8 @@ export function Block({
   setBlock,
   messages,
   setMessages,
+  citations,
+  setCitations,
   votes,
 }: {
   chatId: string;
@@ -70,6 +72,8 @@ export function Block({
   setAttachments: Dispatch<SetStateAction<Array<Attachment>>>;
   block: UIBlock;
   setBlock: Dispatch<SetStateAction<UIBlock>>;
+  citations: { [key: string]: Array<any> };
+  setCitations: Dispatch<SetStateAction<{ [key: string]: Array<any> }>>;
   messages: Array<Message>;
   setMessages: Dispatch<SetStateAction<Array<Message>>>;
   votes: Array<Vote> | undefined;
@@ -290,21 +294,25 @@ export function Block({
               ref={messagesContainerRef}
               className="flex flex-col gap-4 h-full items-center overflow-y-scroll px-4 pt-20"
             >
-              {messages.map((message, index) => (
-                <PreviewMessage
-                  chatId={chatId}
-                  key={message.id}
-                  message={message}
-                  block={block}
-                  setBlock={setBlock}
-                  isLoading={isLoading && index === messages.length - 1}
-                  vote={
-                    votes
-                      ? votes.find((vote) => vote.messageId === message.id)
-                      : undefined
-                  }
-                />
-              ))}
+              {messages.map((message, index) => {
+                return (
+                  <PreviewMessage
+                    chatId={chatId}
+                    key={message.id}
+                    message={message}
+                    block={block}
+                    setBlock={setBlock}
+                    citations={citations}
+                    setCitations={setCitations}
+                    isLoading={isLoading && index === messages.length - 1}
+                    vote={
+                      votes
+                        ? votes.find((vote) => vote.messageId === message.id)
+                        : undefined
+                    }
+                  />
+                );
+              })}
 
               <div
                 ref={messagesEndRef}

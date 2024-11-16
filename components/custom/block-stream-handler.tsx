@@ -1,21 +1,28 @@
-import { JSONValue } from 'ai';
+import { JSONValue, Message } from 'ai';
 import { Dispatch, memo, SetStateAction } from 'react';
 
 import { UIBlock } from './block';
 import { useBlockStream } from './use-block-stream';
+import { QarkMessage } from './message';
 
 interface BlockStreamHandlerProps {
   setBlock: Dispatch<SetStateAction<UIBlock>>;
+  setMessages: Dispatch<SetStateAction<Message[]>>;
+  setCitations: Dispatch<SetStateAction<{ [key: string]: Array<any> }>>;
   streamingData: JSONValue[] | undefined;
 }
 
 export function PureBlockStreamHandler({
   setBlock,
+  setCitations,
+  setMessages,
   streamingData,
 }: BlockStreamHandlerProps) {
   useBlockStream({
     streamingData,
     setBlock,
+    setMessages,
+    setCitations
   });
 
   return null;
