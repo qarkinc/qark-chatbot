@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { type User } from 'next-auth';
-import { v4 as uudiV4 } from "uuid";
 
 import { LogoGMail, LogoGoogle, LogoWhatsapp, PlusIcon } from '@/components/custom/icons';
 import { SidebarHistory } from '@/components/custom/sidebar-history';
@@ -20,46 +19,46 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { BetterTooltip } from '@/components/ui/tooltip';
+import { User as pgUser } from '@/db/schema';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 
-export function AppSidebar({ user }: { user: User | undefined }) {
+export function AppSidebar({
+  currentUser,
+  userRecord
+}: {
+  currentUser: User | undefined,
+  userRecord: pgUser | null,
+}) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { setOpenMobile } = useSidebar();
 
-  const handleGoogleConnection = async () => {
-    // Generate a unique UUID for the state parameter to prevent CSRF attacks
-    const stateUUID = uudiV4();
+  useEffect(() => {
+    const handleToastNotifications = (
+      key: string,
+      successMessage: string,
+      failureMessage: string
+    ) => {
+      const status = searchParams.get(key);
 
-    // Store the generated UUID in localstorage to validate the state upon callback
-    localStorage.setItem("generated_uuid", stateUUID);
+      if (status === "success") {
+        toast.success(successMessage);
+      } else if (status === "failed") {
+        toast.error(failureMessage);
+      }
 
-    // Initialize the base URL for Google's OAuth2 authorization endpoint
-    const googleAuthUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+      // Remove the query parameter from the URL after handling
+      if (status) {
+        router.replace("/");
+      }
+    };
 
-    // Set the client ID parameter for your Google app (stored in environment variables)
-    googleAuthUrl.searchParams.set("client_id", process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!);
-
-    // Set the redirect URI to handle the response from Google after authentication
-    googleAuthUrl.searchParams.set("redirect_uri", `${window.location.origin}/google_auth`);
-
-    // Set the response type to "token" to use the implicit flow, which returns an access token directly
-    googleAuthUrl.searchParams.set("response_type", "token");
-
-    // Specify the OAuth scope, which in this case allows reading Gmail messages
-    googleAuthUrl.searchParams.set("scope", "https://www.googleapis.com/auth/gmail.readonly");
-
-    // Include previously granted scopes to avoid redundant permission prompts
-    googleAuthUrl.searchParams.set("include_granted_scopes", "true");
-
-    // Set the unique state value to protect against CSRF; Google will return this exact value
-    googleAuthUrl.searchParams.set("state", stateUUID);
-
-    // Set prompt to "consent" to ensure Google shows the permission screen each time
-    googleAuthUrl.searchParams.set("prompt", "consent");
-
-    // Open the Google authorization URL in a new tab with security options
-    window.open(googleAuthUrl, "_blank", "noopener,noreferrer");
-  }
+    // Handle notifications for authorization and revoke-access
+    handleToastNotifications("authorization_status", "Gmail linked successfully!", "Gmail linking failed. Please try again.");
+    handleToastNotifications("revoke_access_status", "Gmail unlinked successfully!", "Failed to unlink Gmail access. Please try again.");
+  }, [router, searchParams]);
 
   return (
     <Sidebar className="group-data-[side=left]:border-r-0">
@@ -96,26 +95,30 @@ export function AppSidebar({ user }: { user: User | undefined }) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <Button variant="outline" className="mb-2 flex justify-start" onClick={handleGoogleConnection}>
-            <LogoGMail size={44} />
-            <span >Connect Gmail</span>
-          </Button>
-          {/* <Link href={"/google"} passHref>
-          </Link> */}
-          <Button variant="outline" className="flex justify-start">
+          <Link
+            href={`/api/google_auth/${(userRecord?.isGmailConnected ?? false) ? "revoke-access" : "authorize"}?user_id=${currentUser?.id}`}
+            target="_blank"
+            className="w-full"
+          >
+            <Button variant="outline" className="mb-2 flex justify-start w-full">
+              <LogoGMail size={44} />
+              <span >{(userRecord?.isGmailConnected ?? false) ? "Unlink" : "Link"} Gmail</span>
+            </Button>
+          </Link>
+          <Button variant="outline" className="flex justify-start" onClick={() => toast.warning("Under Development")}>
             <LogoWhatsapp size={44} />
-            <span >Connect Whatsapp</span>
+            <span >Link Whatsapp</span>
           </Button>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarHistory user={user} />
+          <SidebarHistory user={currentUser} />
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="gap-0">
-        {user && (
+        {currentUser && (
           <SidebarGroup>
             <SidebarGroupContent>
-              <SidebarUserNav user={user} />
+              <SidebarUserNav user={currentUser} />
             </SidebarGroupContent>
           </SidebarGroup>
         )}

@@ -18,8 +18,7 @@ export const user = pgTable('User', {
   password: varchar('password', { length: 64 }),
   registererdOn: timestamp("registererdOn", { mode: "date" }).notNull().defaultNow(),
   isGmailConnected: boolean("isGmailConnected").default(false),
-  gmailAccessToken: varchar("gmailAccessToken"),
-  gmailRefreshToken: varchar("gmailRefreshToken"),
+  gmailToken: json("gmailToken"),
   gmailConnectedOn: timestamp("gmailConnectedOn", { mode: "date" }),
   gmailTokenExpiry: timestamp("gmailTokenExpiry", { mode: "date" }),
 });

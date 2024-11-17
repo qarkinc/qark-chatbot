@@ -8,8 +8,7 @@ CREATE TABLE IF NOT EXISTS "Citation" (
 --> statement-breakpoint
 ALTER TABLE "User" ADD COLUMN "registererdOn" timestamp DEFAULT now() NOT NULL;--> statement-breakpoint
 ALTER TABLE "User" ADD COLUMN "isGmailConnected" boolean DEFAULT false;--> statement-breakpoint
-ALTER TABLE "User" ADD COLUMN "gmailAccessToken" varchar;--> statement-breakpoint
-ALTER TABLE "User" ADD COLUMN "gmailRefreshToken" varchar;--> statement-breakpoint
+ALTER TABLE "User" ADD COLUMN "gmailToken" json;--> statement-breakpoint
 ALTER TABLE "User" ADD COLUMN "gmailConnectedOn" timestamp;--> statement-breakpoint
 ALTER TABLE "User" ADD COLUMN "gmailTokenExpiry" timestamp;--> statement-breakpoint
 DO $$ BEGIN

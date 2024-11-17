@@ -1,5 +1,5 @@
 {
-  "id": "49504df8-5e02-4a22-8076-b45acda5bf73",
+  "id": "ad59aab7-601a-47b4-96f2-f7d00220c578",
   "prevId": "b5d8e862-936f-4419-a50f-97be3e7fe665",
   "version": "7",
   "dialect": "postgresql",
@@ -365,15 +365,9 @@
           "notNull": false,
           "default": false
         },
-        "gmailAccessToken": {
-          "name": "gmailAccessToken",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "gmailRefreshToken": {
-          "name": "gmailRefreshToken",
-          "type": "varchar",
+        "gmailToken": {
+          "name": "gmailToken",
+          "type": "json",
           "primaryKey": false,
           "notNull": false
         },
