@@ -16,10 +16,12 @@ export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   email: varchar('email', { length: 64 }).notNull(),
   password: varchar('password', { length: 64 }),
-  googleAccessToken: varchar('googleAccessToken'),
-  googleTokenType: varchar('googleTokenType'),
-  accessTokenExpiry: timestamp('accessTokenExpiry', { mode: "date" }),
-  scopes: json("scopes")
+  registererdOn: timestamp("registererdOn", { mode: "date" }).notNull().defaultNow(),
+  isGmailConnected: boolean("isGmailConnected").default(false),
+  gmailAccessToken: varchar("gmailAccessToken"),
+  gmailRefreshToken: varchar("gmailRefreshToken"),
+  gmailConnectedOn: timestamp("gmailConnectedOn", { mode: "date" }),
+  gmailTokenExpiry: timestamp("gmailTokenExpiry", { mode: "date" }),
 });
 
 export type User = InferSelectModel<typeof user>;
@@ -46,6 +48,25 @@ export const message = pgTable('Message', {
 });
 
 export type Message = InferSelectModel<typeof message>;
+
+export const citation = pgTable("Citation", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	messageId: uuid().notNull(),
+	appMessageId: varchar().notNull(),
+	subject: varchar().notNull(),
+	createdAt: timestamp({ mode: 'string' }).notNull(),
+},
+(table) => {
+	return {
+		citationMessageIdMessageIdFk: foreignKey({
+			columns: [table.messageId],
+			foreignColumns: [message.id],
+			name: "Citation_messageId_Message_id_fk"
+		}),
+	}
+});
+
+export type Citation = InferSelectModel<typeof citation>;
 
 export const vote = pgTable(
   'Vote',
