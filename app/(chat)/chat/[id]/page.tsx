@@ -44,7 +44,7 @@ export default async function Page(props: { params: Promise<any> }) {
       id={chat.id}
       initialMessages={convertToUIMessages(messagesFromDb)}
       selectedModelId={selectedModelId}
-      // user={user}
+      userId={session?.user?.id}
     />
   );
 }

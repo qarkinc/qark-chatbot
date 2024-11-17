@@ -22,12 +22,12 @@ export function Chat({
   id,
   initialMessages,
   selectedModelId,
-  // user
+  userId,
 }: {
   id: string;
   initialMessages: Array<Message>;
   selectedModelId: string;
-  // user?: User | null
+  userId?: string | null
 }) {
   const { mutate } = useSWRConfig();
 
@@ -42,7 +42,7 @@ export function Chat({
     stop,
     data: streamingData,
   } = useChat({
-    body: { id, modelId: selectedModelId },
+    body: { id, modelId: selectedModelId, userId },
     initialMessages,
     // TODO: Remove if we end up using server side oauth
     // experimental_prepareRequestBody: (options) => {

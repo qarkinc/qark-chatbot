@@ -3,9 +3,7 @@ import { cookies } from 'next/headers';
 import { DEFAULT_MODEL_NAME, models } from '@/ai/models';
 import { Chat } from '@/components/custom/chat';
 import { generateUUID } from '@/lib/utils';
-// import { getUserById } from '@/db/queries';
-// import { auth } from '../(auth)/auth';
-// import { User } from '@/db/schema';
+import { auth } from '../(auth)/auth';
 
 export default async function Page() {
   const id = generateUUID();
@@ -18,13 +16,7 @@ export default async function Page() {
     DEFAULT_MODEL_NAME;
 
     
-  // const session = await auth();
-  // let user: User | null = null;
-  // if (session && session.user) {
-  //   user = (await getUserById(session.user.id!))[0] ?? null;
-  //   console.log(user);
-    
-  // }
+  const session = await auth();
 
   return (
     <Chat
@@ -32,7 +24,7 @@ export default async function Page() {
       id={id}
       initialMessages={[]}
       selectedModelId={selectedModelId}
-      // user={user}
+      userId={session?.user?.id}
     />
   );
 }
