@@ -15,6 +15,8 @@ import {
   Message,
   message,
   vote,
+  Citation,
+  citation,
 } from './schema';
 
 // Optionally, if not using email/pass login, you can
@@ -53,21 +55,10 @@ export async function createUser(email: string, password: string) {
   }
 }
 
-export async function saveUserCredentials(user_id: string, { token_type, access_token, expires_in, scope: scopes }: {
-  access_token: string,
-  token_type: string,
-  expires_in: number
-  scope: Array<string>
-}) {
-
+export async function updateUser<T extends Partial<User>>(user_id: string, updatedUserRecord: T) {
   try {
     return await db.update(user)
-    .set({
-      googleAccessToken: access_token,
-      accessTokenExpiry: new Date(expires_in),
-      googleTokenType: token_type,
-      scopes: scopes,
-    })
+    .set({ ...updatedUserRecord })
     .where(eq(user.id, user_id))
     .returning();
   } catch (error) {
