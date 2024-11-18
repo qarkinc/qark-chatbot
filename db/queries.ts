@@ -58,9 +58,9 @@ export async function createUser(email: string, password: string) {
 export async function updateUser<T extends Partial<User>>(user_id: string, updatedUserRecord: T) {
   try {
     return await db.update(user)
-    .set({ ...updatedUserRecord })
-    .where(eq(user.id, user_id))
-    .returning();
+      .set({ ...updatedUserRecord })
+      .where(eq(user.id, user_id))
+      .returning();
   } catch (error) {
     console.error('Failed to create user in database');
     throw error;
@@ -135,11 +135,28 @@ export async function saveMessages({ messages }: { messages: Array<Message> }) {
 
 export async function getMessagesByChatId({ id }: { id: string }) {
   try {
-    return await db
+    const messages = await db
       .select()
       .from(message)
       .where(eq(message.chatId, id))
       .orderBy(asc(message.createdAt));
+
+    return messages;
+  } catch (error) {
+    console.error('Failed to get messages by chat id from database', error);
+    throw error;
+  }
+}
+
+export async function getCitationsByMessageId({ id }: { id: string }) {
+  try {
+    const citationsFromDb = await db
+      .select()
+      .from(citation)
+      .where(eq(citation.messageId, id))
+      .orderBy(asc(citation.createdAt));
+
+    return citationsFromDb;
   } catch (error) {
     console.error('Failed to get messages by chat id from database', error);
     throw error;

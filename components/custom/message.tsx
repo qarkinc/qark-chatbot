@@ -157,9 +157,9 @@ export const PreviewMessage = ({
                         {_citations.slice(0, 3).map((ele, idx) => {
                           if (String(ele.subject).length === 0) return null;
 
-                          const mailLink = `https://mail.google.com/mail/u/0/#all/${ele.message_id}`
+                          const mailLink = `https://mail.google.com/mail/u/0/#all/${ele.appMessageId}`
                           return (
-                            <Link href={mailLink} key={ele.message_id} target='_blank'>
+                            <Link href={mailLink} key={`${ele.appMessageId}-${idx}`} target='_blank'>
                               <Card className='p-2 size-full hover:bg-muted-foreground/20 bg-muted'>
                                 <span className='text-sm'>
                                   {String(ele.subject).substring(0, 30)}...
@@ -204,14 +204,13 @@ export const PreviewMessage = ({
 
             {
               <div className='h-full overflow-y-auto'>
-                {Array.from(citations[message?.id] ?? []).map((ele) => {
+                {Array.from(citations[message?.id] ?? []).map((ele, idx) => {
                   if (String(ele.subject).trim().length === 0) return null;
 
-                  const mailLink = `https://mail.google.com/mail/u/0/#all/${ele.message_id}`
+                  const mailLink = `https://mail.google.com/mail/u/0/#all/${ele.appMessageId}`
                   return (
-                    <Link href={mailLink} key={ele.message_id} target='_blank'>
+                    <Link href={mailLink} key={`${ele.appMessageId}-${idx}`} target='_blank'>
                       <Card className='p-2 w-full border-muted hover:bg-muted-foreground/20 bg-muted mb-4'>
-
                         <span>{ele.subject}</span>
                         <div className="flex text-xs w-full items-center gap-1">
                           <LogoGMail />

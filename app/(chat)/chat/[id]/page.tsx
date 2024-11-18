@@ -6,7 +6,7 @@ import { DEFAULT_MODEL_NAME, models } from '@/ai/models';
 import { auth } from '@/app/(auth)/auth';
 import { Chat as PreviewChat } from '@/components/custom/chat';
 // import { getChatById, getMessagesByChatId, getUserById } from '@/db/queries';
-import { getChatById, getMessagesByChatId } from '@/db/queries';
+import { getChatById, getCitationsByMessageId, getMessagesByChatId } from '@/db/queries';
 import { convertToUIMessages } from '@/lib/utils';
 
 export default async function Page(props: { params: Promise<any> }) {
@@ -32,6 +32,12 @@ export default async function Page(props: { params: Promise<any> }) {
     id,
   });
 
+  let citations: { [key: string]: Array<any> } = {};
+  for await (const message of messagesFromDb) {
+    const messageCitations = await getCitationsByMessageId({ id: message.id });
+    citations[message.id] = [...messageCitations];
+  }
+
   const cookieStore = await cookies();
   const modelIdFromCookie = cookieStore.get('model-id')?.value;
   const selectedModelId =
@@ -45,6 +51,7 @@ export default async function Page(props: { params: Promise<any> }) {
       initialMessages={convertToUIMessages(messagesFromDb)}
       selectedModelId={selectedModelId}
       userId={session?.user?.id}
+      messageCitations={citations}
     />
   );
 }

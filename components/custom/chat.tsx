@@ -23,11 +23,13 @@ export function Chat({
   initialMessages,
   selectedModelId,
   userId,
+  messageCitations={}
 }: {
   id: string;
   initialMessages: Array<Message>;
   selectedModelId: string;
-  userId?: string | null
+  userId?: string | null,
+  messageCitations?: { [key: string]: Array<string> },
 }) {
   const { mutate } = useSWRConfig();
 
@@ -76,7 +78,7 @@ export function Chat({
     },
   });
 
-  const [citations, setCitations] = useState<{[key: string]: Array<any>}>({});
+  const [citations, setCitations] = useState<{[key: string]: Array<any>}>({ ...messageCitations });
 
   const { data: votes } = useSWR<Array<Vote>>(
     `/api/vote?chatId=${id}`,
