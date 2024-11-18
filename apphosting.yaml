@@ -22,5 +22,11 @@ env:
   - variable: GOOGLE_CLIENT_SECRET
     secret: GOOGLE_CLIENT_SECRET
 
+  - variable: NEXTAUTH_SECRET
+    secret: NEXTAUTH_SECRET
+
+  - variable: NEXTAUTH_URL
+    value: https://qark-chat.qarkx.com/
+
   - variable: REDIRECT_URI
     value: api/google_auth/oauth2callback
