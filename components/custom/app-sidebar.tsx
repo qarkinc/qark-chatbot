@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type User } from 'next-auth';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 import { LogoGMail, LogoGoogle, LogoWhatsapp, PlusIcon } from '@/components/custom/icons';
 import { SidebarHistory } from '@/components/custom/sidebar-history';
@@ -20,8 +22,6 @@ import {
 } from '@/components/ui/sidebar';
 import { BetterTooltip } from '@/components/ui/tooltip';
 import { User as pgUser } from '@/db/schema';
-import { useEffect } from 'react';
-import { toast } from 'sonner';
 
 
 export function AppSidebar({

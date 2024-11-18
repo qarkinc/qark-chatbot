@@ -5,7 +5,6 @@ import { useSWRConfig } from 'swr';
 import { Suggestion } from '@/db/schema';
 
 import { UIBlock } from './block';
-import { QarkMessage } from './message';
 
 type StreamingDelta = {
   type: 'text-delta' | 'title' | 'id' | 'suggestion' | 'clear' | 'finish' | 'citation';
@@ -38,10 +37,10 @@ export function useBlockStream({
 
   useEffect(() => {
     const mostRecentDelta = streamingData?.at(-1);
-    console.log('\nstreamingData: ');
-    console.log(streamingData);
-    console.log('mostRecentDelta: ');
-    console.log(mostRecentDelta);
+    // console.log('\nstreamingData: ');
+    // console.log(streamingData);
+    // console.log('mostRecentDelta: ');
+    // console.log(mostRecentDelta);
     if (!mostRecentDelta) return;
 
     const delta = mostRecentDelta as StreamingDelta;
@@ -127,5 +126,5 @@ export function useBlockStream({
           return draftBlock;
       }
     });
-  }, [streamingData, setBlock]);
+  }, [streamingData, setBlock, setCitations, setMessages]);
 }

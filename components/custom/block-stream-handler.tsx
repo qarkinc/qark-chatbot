@@ -3,7 +3,6 @@ import { Dispatch, memo, SetStateAction } from 'react';
 
 import { UIBlock } from './block';
 import { useBlockStream } from './use-block-stream';
-import { QarkMessage } from './message';
 
 interface BlockStreamHandlerProps {
   setBlock: Dispatch<SetStateAction<UIBlock>>;

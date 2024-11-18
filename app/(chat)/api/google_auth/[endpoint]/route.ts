@@ -1,8 +1,10 @@
-import { getUserById, updateUser } from "@/db/queries";
 import { google, Auth } from "googleapis";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidV4 } from "uuid";
+
+// Add an empty line between different import groups
+import { getUserById, updateUser } from "@/db/queries";
 
 const scopes = [
   'https://www.googleapis.com/auth/gmail.readonly'
