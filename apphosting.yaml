@@ -22,7 +22,7 @@ env:
 
     # Instructions to create a database here: https://vercel.com/docs/storage/vercel-postgres/quickstart
   - variable: POSTGRES_URL
-    value: postgres://default:Hd6ZAM9CcpOr@ep-curly-poetry-a6i01l45-pooler.us-west-2.aws.neon.tech/verceldb?sslmode=require
+    secret: myApiKeySecret
 
   - variable: GOOGLE_CLIENT_ID
     secret: myApiKeySecret
