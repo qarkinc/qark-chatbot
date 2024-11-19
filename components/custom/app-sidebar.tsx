@@ -4,7 +4,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { type User } from 'next-auth';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
-import { LogoGMail, LogoGoogle, LogoWhatsapp, PlusIcon } from '@/components/custom/icons';
+
+import { LogoGMail, LogoWhatsapp, PlusIcon } from '@/components/custom/icons';
 import { SidebarHistory } from '@/components/custom/sidebar-history';
 import { SidebarUserNav } from '@/components/custom/sidebar-user-nav';
 import { Button } from '@/components/ui/button';
