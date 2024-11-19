@@ -35,17 +35,18 @@ export const Overview = () => {
           <code className="rounded-md bg-muted px-1 py-0.5">useChat</code> hook
           on the client to create a seamless chat experience.
         </p> */}
-        {/* <p>
-          You can learn more about the AI SDK by visiting the{' '}
+        <p>
+          Qark is a chatbot that uses AI to answer questions on your personal data - Gmail, Whatsapp, and more.
+          <br />
           <Link
             className="font-medium underline underline-offset-4"
-            href="https://sdk.vercel.ai/docs"
+            href="https://qarkx.com"
             target="_blank"
           >
-            docs
+            Qark Home
           </Link>
           .
-        </p> */}
+        </p>
       </div>
     </motion.div>
   );
