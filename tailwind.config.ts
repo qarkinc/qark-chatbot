@@ -11,6 +11,7 @@ const config: Config = {
     fontFamily: {
       sans: ['geist'],
       mono: ['geist-mono'],
+      instrument: ['"Instrument Sans"', 'sans-serif'],
     },
     extend: {
       borderRadius: {
