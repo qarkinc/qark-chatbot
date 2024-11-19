@@ -1,11 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type User } from 'next-auth';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
-
 import { LogoGMail, LogoGoogle, LogoWhatsapp, PlusIcon } from '@/components/custom/icons';
 import { SidebarHistory } from '@/components/custom/sidebar-history';
 import { SidebarUserNav } from '@/components/custom/sidebar-user-nav';
@@ -34,6 +32,11 @@ export function AppSidebar({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setOpenMobile } = useSidebar();
+
+  const handleOnClick = () => {
+    const url = `${window.location.origin}/api/google_auth/${(userRecord?.isGmailConnected ?? false) ? "revoke-access" : "authorize"}?user_id=${currentUser?.id}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
 
   useEffect(() => {
     const handleToastNotifications = (
@@ -95,16 +98,14 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <Link
-            href={`/api/google_auth/${(userRecord?.isGmailConnected ?? false) ? "revoke-access" : "authorize"}?user_id=${currentUser?.id}`}
-            target="_blank"
-            className="w-full"
-          >
-            <Button variant="outline" className="mb-2 flex justify-start w-full">
-              <LogoGMail size={44} />
-              <span >{(userRecord?.isGmailConnected ?? false) ? "Unlink" : "Link"} Gmail</span>
-            </Button>
-          </Link>
+          <Button variant="outline" className="mb-2 flex justify-start w-full" onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            handleOnClick();
+          }}>
+            <LogoGMail size={44} />
+            <span >{(userRecord?.isGmailConnected ?? false) ? "Unlink" : "Link"} Gmail</span>
+          </Button>
           <Button variant="outline" className="flex justify-start" onClick={() => toast.warning("Under Development")}>
             <LogoWhatsapp size={44} />
             <span >Link Whatsapp</span>
