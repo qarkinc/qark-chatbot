@@ -31,7 +31,7 @@ export const chat = pgTable('Chat', {
   title: text('title').notNull(),
   userId: uuid('userId')
     .notNull()
-    .references(() => user.id),
+    .references(() => user.id, { onDelete: "cascade" }),
 });
 
 export type Chat = InferSelectModel<typeof chat>;
@@ -40,7 +40,7 @@ export const message = pgTable('Message', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   chatId: uuid('chatId')
     .notNull()
-    .references(() => chat.id),
+    .references(() => chat.id, { onDelete: "cascade" }),
   role: varchar('role').notNull(),
   content: json('content').notNull(),
   createdAt: timestamp('createdAt').notNull(),
@@ -61,7 +61,7 @@ export const citation = pgTable("Citation", {
 			columns: [table.messageId],
 			foreignColumns: [message.id],
 			name: "Citation_messageId_Message_id_fk"
-		}),
+		}).onDelete("cascade"),
 	}
 });
 
@@ -72,10 +72,10 @@ export const vote = pgTable(
   {
     chatId: uuid('chatId')
       .notNull()
-      .references(() => chat.id),
+      .references(() => chat.id, { onDelete: "cascade" }),
     messageId: uuid('messageId')
       .notNull()
-      .references(() => message.id),
+      .references(() => message.id, { onDelete: "cascade" }),
     isUpvoted: boolean('isUpvoted').notNull(),
   },
   (table) => {
@@ -96,7 +96,7 @@ export const document = pgTable(
     content: text('content'),
     userId: uuid('userId')
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "cascade" }),
   },
   (table) => {
     return {
@@ -119,7 +119,7 @@ export const suggestion = pgTable(
     isResolved: boolean('isResolved').notNull().default(false),
     userId: uuid('userId')
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "cascade" }),
     createdAt: timestamp('createdAt').notNull(),
   },
   (table) => ({
@@ -127,7 +127,7 @@ export const suggestion = pgTable(
     documentRef: foreignKey({
       columns: [table.documentId, table.documentCreatedAt],
       foreignColumns: [document.id, document.createdAt],
-    }),
+    }).onDelete("cascade"),
   })
 );
 
