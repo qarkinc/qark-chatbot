@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type User } from 'next-auth';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { LogoGMail, LogoWhatsapp, PlusIcon } from '@/components/custom/icons';
@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/sidebar';
 import { BetterTooltip } from '@/components/ui/tooltip';
 import { User as pgUser } from '@/db/schema';
+import ConfirmationModal from './confirmation-modal';
 
 
 export function AppSidebar({
@@ -33,11 +34,7 @@ export function AppSidebar({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setOpenMobile } = useSidebar();
-
-  const handleOnClick = () => {
-    const url = `${window.location.origin}/api/google_auth/${(userRecord?.isGmailConnected ?? false) ? "revoke-access" : "authorize"}?user_id=${currentUser?.id}`;
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const handleToastNotifications = (
@@ -64,67 +61,99 @@ export function AppSidebar({
     handleToastNotifications("revoke_access_status", "Gmail unlinked successfully!", "Failed to unlink Gmail access. Please try again.");
   }, [router, searchParams]);
 
+  // Function to handle revoke-access logic
+  const handleRevokeAccess = () => {
+    const url = `${window.location.origin}/api/google_auth/revoke-access`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  // Function to handle authorize logic
+  const handleAuthorize = () => {
+    const url = `${window.location.origin}/api/google_auth/authorize`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
-    <Sidebar className="group-data-[side=left]:border-r-0">
-      <SidebarHeader>
-        <SidebarMenu>
-          <div className="flex flex-row justify-between items-center">
-            <div
-              onClick={() => {
-                setOpenMobile(false);
-                router.push('/');
-                router.refresh();
-              }}
-              className="flex flex-row gap-3 items-center"
-            >
-              <span className="text-3xl px-2 hover:bg-muted rounded-md cursor-pointer font-instrument" style={{ color: '#d73301' }}>
-                QARK
-              </span>
-            </div>
-            <BetterTooltip content="New Chat" align="start">
-              <Button
-                variant="ghost"
-                className="p-2 h-fit"
+    <>
+      <Sidebar className="group-data-[side=left]:border-r-0">
+        <SidebarHeader>
+          <SidebarMenu>
+            <div className="flex flex-row justify-between items-center">
+              <div
                 onClick={() => {
                   setOpenMobile(false);
                   router.push('/');
                   router.refresh();
                 }}
+                className="flex flex-row gap-3 items-center"
               >
-                <PlusIcon />
-              </Button>
-            </BetterTooltip>
-          </div>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <Button variant="outline" className="mb-2 flex justify-start w-full" onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            handleOnClick();
-          }}>
-            <LogoGMail size={44} />
-            <span >{(userRecord?.isGmailConnected ?? false) ? "Unlink" : "Link"} Gmail</span>
-          </Button>
-          <Button variant="outline" className="flex justify-start" onClick={() => toast.warning("Under Development")}>
-            <LogoWhatsapp size={44} />
-            <span >Link Whatsapp</span>
-          </Button>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarHistory user={currentUser} />
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter className="gap-0">
-        {currentUser && (
+                <span className="text-3xl px-2 hover:bg-muted rounded-md cursor-pointer font-instrument" style={{ color: '#d73301' }}>
+                  QARK
+                </span>
+              </div>
+              <BetterTooltip content="New Chat" align="start">
+                <Button
+                  variant="ghost"
+                  className="p-2 h-fit"
+                  onClick={() => {
+                    setOpenMobile(false);
+                    router.push('/');
+                    router.refresh();
+                  }}
+                >
+                  <PlusIcon />
+                </Button>
+              </BetterTooltip>
+            </div>
+          </SidebarMenu>
+        </SidebarHeader>
+        <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarUserNav user={currentUser} />
-            </SidebarGroupContent>
+            <Button variant="outline" className="mb-2 flex justify-start w-full" onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              if (userRecord?.isGmailConnected ?? false) {
+                setIsModalOpen(true);
+              } else {
+                handleAuthorize();
+              }
+            }}>
+              <LogoGMail size={44} />
+              <span >{(userRecord?.isGmailConnected ?? false) ? "Unlink" : "Link"} Gmail</span>
+            </Button>
+            <Button variant="outline" className="flex justify-start" onClick={() => toast.warning("Will be available soon")}>
+              <LogoWhatsapp size={44} />
+              <span >Link Whatsapp</span>
+            </Button>
           </SidebarGroup>
-        )}
-      </SidebarFooter>
-    </Sidebar>
+          <SidebarGroup>
+            <SidebarHistory user={currentUser} />
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter className="gap-0">
+          {currentUser && (
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarUserNav user={currentUser} />
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
+        </SidebarFooter>
+      </Sidebar>
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        message="Do you want to proceed with unlinking Gmail?"
+        yesBtnText="Proceed"
+        noBtnText="Cancel"
+        isAcceptedCallback={(isAccpted) => {
+          if (isAccpted) {
+            handleRevokeAccess();
+          }
+          setIsModalOpen(false);
+        }}
+      />
+    </>
+
   );
 }
