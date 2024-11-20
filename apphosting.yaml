@@ -30,3 +30,6 @@ env:
 
   - variable: REDIRECT_URI
     value: api/google_auth/oauth2callback
+
+  - variable: PROD_APP_URL
+    value: https://app.qarkx.com
