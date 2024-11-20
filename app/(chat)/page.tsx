@@ -32,7 +32,7 @@ export default async function Page() {
       id={id}
       initialMessages={[]}
       selectedModelId={selectedModelId}
-      user={{ id: session?.user?.id! } as any}
+      user={userRecord}
     />
   );
 }

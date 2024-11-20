@@ -120,7 +120,7 @@ export function MultimodalInput({
 
   const submitForm = useCallback(() => {
     if (!user?.isGmailConnected) {
-      toast.success("Please link gmail account with this app and then try again");
+      toast.error("Please link your Gmail account to Qark from the Menu and try again!");
       return;
     }
     window.history.replaceState({}, '', `/chat/${chatId}`);
@@ -142,6 +142,7 @@ export function MultimodalInput({
     setLocalStorageInput,
     width,
     chatId,
+    user,
   ]);
 
   const uploadFile = async (file: File) => {
