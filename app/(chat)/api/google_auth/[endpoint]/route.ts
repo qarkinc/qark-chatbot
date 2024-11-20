@@ -26,8 +26,15 @@ export async function GET(
 
   // Parse request URL for origin and query parameters
   const { origin, searchParams } = new URL(request.url);
-  const redirect_uri = `${origin}/${process.env.REDIRECT_URI}`;
 
+  let redirect_uri = '';
+  // console.log("process.env.NODE_ENV: ", process.env.NODE_ENV);
+  if (process.env.NODE_ENV === 'development') {
+    redirect_uri = `${origin}/${process.env.REDIRECT_URI}`;
+  }
+  else {
+    redirect_uri = `${process.env.PROD_APP_URL}/${process.env.REDIRECT_URI}`;
+  }
 
   // Handle the "authorize" endpoint
   if (endpoint === "authorize") {
