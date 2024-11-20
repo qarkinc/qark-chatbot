@@ -5,6 +5,8 @@ import { Chat } from '@/components/custom/chat';
 import { generateUUID } from '@/lib/utils';
 
 import { auth } from '../(auth)/auth';
+import { getUserById } from '@/db/queries';
+import { User } from '@/db/schema';
 
 export default async function Page() {
   const id = generateUUID();
@@ -18,6 +20,11 @@ export default async function Page() {
 
     
   const session = await auth();
+  let userRecord: User | null = null;
+  if (session?.user) {
+    const users = await getUserById(session.user.id!) ?? [];
+    if (users.length !== 0) userRecord = Object.assign({}, {...users[0]});
+  }
 
   return (
     <Chat
@@ -25,7 +32,7 @@ export default async function Page() {
       id={id}
       initialMessages={[]}
       selectedModelId={selectedModelId}
-      userId={session?.user?.id}
+      user={{ id: session?.user?.id! } as any}
     />
   );
 }
