@@ -5,6 +5,7 @@ import { v4 as uuidV4 } from "uuid";
 
 // Add an empty line between different import groups
 import { getUserById, updateUser } from "@/db/queries";
+import { auth } from "@/app/(auth)/auth";
 
 const scopes = [
   'https://www.googleapis.com/auth/gmail.readonly'
@@ -14,6 +15,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ endpoint: string }> }
 ) {
+  const session = await auth();
+  if (!session || !session.user || !session.user.id) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   // Extract endpoint and cookies
   const endpoint = (await params).endpoint;
   const cookieStore = await cookies();
@@ -29,7 +35,7 @@ export async function GET(
 
     // Store state and user_id in cookies to validate callback later
     cookieStore.set("state", state);
-    cookieStore.set("user_id", searchParams.get("user_id")!);
+    cookieStore.set("user_id", session.user.id!);
 
     // Redirect to Google authorization URL
     return NextResponse.redirect(new URL(authorization_url, request.url));
@@ -80,7 +86,7 @@ export async function GET(
 
   if (endpoint === "revoke-access") {
     // Extract the user_id from the search parameters
-    const user_id = searchParams.get("user_id")!;
+    const user_id = session.user.id!;
 
     // Fetch the user data using the provided user_id
     // Replace the database query function with your actual implementation
@@ -189,8 +195,23 @@ async function revokeUserAccess(userToken: Auth.Credentials): Promise<boolean> {
       process.env.GOOGLE_CLIENT_SECRET // Google client secret from environment variables
     );
 
-    // Set the access token for the OAuth2 client
-    oauth2Client.setCredentials(userToken);
+    // Initialize credentials with the provided user token
+    let credentials = userToken;
+
+    // Check if the token has expired
+    if (new Date(userToken.expiry_date!).getTime() < new Date().getTime()) {
+      // If expired, set the refresh token to get a new access token
+      oauth2Client.setCredentials({
+        refresh_token: userToken.refresh_token
+      });
+
+      // Refresh the access token and update the credentials
+      const response = await oauth2Client.refreshAccessToken();
+      credentials = response.credentials; // Update credentials with the new token
+    }
+
+    // Set the (possibly refreshed) access token for the OAuth2 client
+    oauth2Client.setCredentials(credentials);
 
     // Attempt to revoke the access token using Google's OAuth2 API
     await oauth2Client.revokeCredentials();

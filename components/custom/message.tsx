@@ -17,6 +17,7 @@ import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
 import { Card, CardContent } from '../ui/card';
+import { useAgent } from '@/hooks/use-agent';
 
 
 export type QarkMessage = Message & {
@@ -41,7 +42,7 @@ export const PreviewMessage = ({
   vote: Vote | undefined;
   isLoading: boolean;
 }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { isDesktop } = useAgent();
 
   return (
     <>
@@ -157,10 +158,16 @@ export const PreviewMessage = ({
                         {_citations.slice(0, 3).map((ele, idx) => {
                           if (String(ele.subject).length === 0) return null;
 
-                          const mailLink = `https://mail.google.com/mail/u/0/#all/${ele.appMessageId}`
+                          let mailLink;
+                          if (isDesktop) {
+                            mailLink = `https://mail.google.com/mail/u/0/#all/${ele.appMessageId}`;
+                          } else {
+                            mailLink = `https://mail.google.com/mail/mu/mp/#cv/All%20Mail/${ele.appMessageId}`;
+                          }
+
                           return (
                             <Link href={mailLink} key={`${ele.appMessageId}-${idx}`} target='_blank'>
-                              <Card className='p-2 size-full hover:bg-muted-foreground/20 bg-muted'>
+                              <Card className='p-2 size-full hover:bg-muted-foreground/30 bg-muted'>
                                 <span className='text-sm'>
                                   {String(ele.subject).substring(0, 30)}...
                                 </span>
@@ -174,7 +181,7 @@ export const PreviewMessage = ({
                         })}
                         {_citations.length > 4 && (
                           <Dialog.Trigger asChild>
-                            <Card className='p-2 hover:bg-muted-foreground/20 bg-muted size-full rounded-lg cursor-pointer select-none'>
+                            <Card className='p-2 hover:bg-muted-foreground/30 bg-muted size-full rounded-lg cursor-pointer select-none'>
                               <span>More Sources</span>
                             </Card>
                           </Dialog.Trigger>
@@ -199,7 +206,7 @@ export const PreviewMessage = ({
         </motion.div>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50 w-full z-10" />
-          <Dialog.Content className="fixed top-0 right-0 h-full w-1/3 bg-sidebar shadow-lg p-6 z-50 rounded-ss-lg rounded-es-lg">
+          <Dialog.Content className="fixed top-0 right-0 h-full w-4/6 md:w-1/3 bg-sidebar shadow-lg p-6 z-50 rounded-ss-lg rounded-es-lg">
             <Dialog.Title className='mb-2'>Sourcees</Dialog.Title>
 
             {
@@ -207,10 +214,16 @@ export const PreviewMessage = ({
                 {Array.from(citations[message?.id] ?? []).map((ele, idx) => {
                   if (String(ele.subject).trim().length === 0) return null;
 
-                  const mailLink = `https://mail.google.com/mail/u/0/#all/${ele.appMessageId}`
+                  let mailLink;
+                  if (isDesktop) {
+                    mailLink = `https://mail.google.com/mail/u/0/#all/${ele.appMessageId}`;
+                  } else {
+                    mailLink = `https://mail.google.com/mail/mu/mp/#cv/All%20Mail/${ele.appMessageId}`;
+                  }
+
                   return (
                     <Link href={mailLink} key={`${ele.appMessageId}-${idx}`} target='_blank'>
-                      <Card className='p-2 w-full border-muted hover:bg-muted-foreground/20 bg-muted mb-4'>
+                      <Card className='p-2 w-full border-muted hover:bg-muted-foreground/30 bg-muted mb-4'>
                         <span>{ele.subject}</span>
                         <div className="flex text-xs w-full items-center gap-1">
                           <LogoGMail />

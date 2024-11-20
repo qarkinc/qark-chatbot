@@ -29,6 +29,13 @@
       "when": 1731833547910,
       "tag": "0003_messy_loners",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1732022565855,
+      "tag": "0004_bumpy_vindicator",
+      "breakpoints": true
     }
   ]
 }
