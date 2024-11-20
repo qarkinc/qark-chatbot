@@ -22,13 +22,13 @@ export function Chat({
   id,
   initialMessages,
   selectedModelId,
-  userId,
+  user,
   messageCitations={}
 }: {
   id: string;
   initialMessages: Array<Message>;
   selectedModelId: string;
-  userId?: string | null,
+  user: User | null,
   messageCitations?: { [key: string]: Array<string> },
 }) {
   const { mutate } = useSWRConfig();
@@ -44,7 +44,7 @@ export function Chat({
     stop,
     data: streamingData,
   } = useChat({
-    body: { id, modelId: selectedModelId, userId },
+    body: { id, modelId: selectedModelId, userId: user?.id },
     initialMessages,
     // TODO: Remove if we end up using server side oauth
     // experimental_prepareRequestBody: (options) => {
@@ -144,6 +144,7 @@ export function Chat({
             messages={messages}
             setMessages={setMessages}
             append={append}
+            user={user}
           />
         </form>
       </div>
@@ -167,6 +168,7 @@ export function Chat({
             citations={citations}
             setCitations={setCitations}
             votes={votes}
+            user={user}
           />
         )}
       </AnimatePresence>

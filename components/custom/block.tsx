@@ -17,7 +17,7 @@ import {
   useWindowSize,
 } from 'usehooks-ts';
 
-import { Document, Suggestion, Vote } from '@/db/schema';
+import { Document, Suggestion, User, Vote } from '@/db/schema';
 import { fetcher } from '@/lib/utils';
 
 import { DiffView } from './diffview';
@@ -62,6 +62,7 @@ export function Block({
   citations,
   setCitations,
   votes,
+  user,
 }: {
   chatId: string;
   input: string;
@@ -77,6 +78,7 @@ export function Block({
   messages: Array<Message>;
   setMessages: Dispatch<SetStateAction<Array<Message>>>;
   votes: Array<Vote> | undefined;
+  user: User | null
   append: (
     message: Message | CreateMessage,
     chatRequestOptions?: ChatRequestOptions
@@ -334,6 +336,7 @@ export function Block({
                 append={append}
                 className="bg-background dark:bg-muted"
                 setMessages={setMessages}
+                user={user}
               />
             </form>
           </div>

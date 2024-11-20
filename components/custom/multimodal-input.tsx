@@ -21,6 +21,7 @@ import { ArrowUpIcon, PaperclipIcon, StopIcon } from './icons';
 import { PreviewAttachment } from './preview-attachment';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
+import { User } from '@/db/schema';
 
 const suggestedActions = [
   {
@@ -48,6 +49,7 @@ export function MultimodalInput({
   append,
   handleSubmit,
   className,
+  user
 }: {
   chatId: string;
   input: string;
@@ -58,6 +60,7 @@ export function MultimodalInput({
   setAttachments: Dispatch<SetStateAction<Array<Attachment>>>;
   messages: Array<Message>;
   setMessages: Dispatch<SetStateAction<Array<Message>>>;
+  user?: User | null,
   append: (
     message: Message | CreateMessage,
     chatRequestOptions?: ChatRequestOptions
@@ -116,6 +119,10 @@ export function MultimodalInput({
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
 
   const submitForm = useCallback(() => {
+    if (!user?.isGmailConnected) {
+      toast.success("Please link gmail account with this app and then try again");
+      return;
+    }
     window.history.replaceState({}, '', `/chat/${chatId}`);
 
     handleSubmit(undefined, {
