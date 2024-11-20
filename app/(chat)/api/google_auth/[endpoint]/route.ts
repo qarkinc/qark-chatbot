@@ -27,14 +27,15 @@ export async function GET(
   // Parse request URL for origin and query parameters
   const { origin, searchParams } = new URL(request.url);
 
-  let redirect_uri = '';
-  // console.log("process.env.NODE_ENV: ", process.env.NODE_ENV);
+  let base_url = '';
   if (process.env.NODE_ENV === 'development') {
-    redirect_uri = `${origin}/${process.env.REDIRECT_URI}`;
+    base_url = origin;
   }
   else {
-    redirect_uri = `${process.env.PROD_APP_URL}/${process.env.REDIRECT_URI}`;
+    base_url = process.env.PROD_APP_URL!;
   }
+
+  const redirect_uri = `${base_url}/${process.env.REDIRECT_URI}`;
 
   // Handle the "authorize" endpoint
   if (endpoint === "authorize") {
@@ -61,7 +62,7 @@ export async function GET(
 
     if (state !== cookie_state) {
       console.log("AuthorizationRequest Reject!! May be CSRF Attack");
-      return NextResponse.redirect(new URL("/?authorization_status=failed", request.url));
+      return NextResponse.redirect(new URL("/?authorization_status=failed", base_url));
     }
 
     // Proceed if "code" is present in the callback
@@ -80,14 +81,14 @@ export async function GET(
           gmailConnectedOn: new Date(),
         });
 
-        return NextResponse.redirect(new URL("/?authorization_status=success", request.url));
+        return NextResponse.redirect(new URL("/?authorization_status=success", base_url));
       } else {
-        return NextResponse.redirect(new URL("/?authorization_status=failed", request.url));
+        return NextResponse.redirect(new URL("/?authorization_status=failed", base_url));
       }
     } else {
       // Handle case where "code" is missing
       console.error("Missing code in OAuth2 callback.");
-      return NextResponse.redirect(new URL("/?authorization_status=failed", request.url));
+      return NextResponse.redirect(new URL("/?authorization_status=failed", base_url));
     }
   }
 
@@ -102,7 +103,7 @@ export async function GET(
     // If the user does not exist or the Gmail access token is missing,
     // redirect to the homepage with a failure status
     if (!user || !user.gmailToken) {
-      return NextResponse.redirect(new URL("/?revoke_access_status=failed", request.url));
+      return NextResponse.redirect(new URL("/?revoke_access_status=failed", base_url));
     }
 
     // Revoke the Gmail access token via the revokeUserAccess function
@@ -119,17 +120,16 @@ export async function GET(
       });
 
       // Redirect to the homepage with a success status
-      return NextResponse.redirect(new URL("/?revoke_access_status=success", request.url));
+      return NextResponse.redirect(new URL("/?revoke_access_status=success", base_url));
     } else {
       // If the revocation fails, redirect to the homepage with a failure status
-      return NextResponse.redirect(new URL("/?revoke_access_status=failed", request.url));
+      return NextResponse.redirect(new URL("/?revoke_access_status=failed", base_url));
     }
   }
 
   // Fallback for unknown endpoints
   console.error("Unknown endpoint accessed:", endpoint);
-  return NextResponse.redirect(new URL("/", request.url));
-
+  return NextResponse.redirect(new URL("/", base_url));
 }
 
 // Generates the Google authorization URL and a state token for validation
