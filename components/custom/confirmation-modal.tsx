@@ -1,5 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { clsx } from 'clsx'; // Optional utility for conditional classes
+
 import React from 'react';
 import { Button } from '../ui/button';
 
@@ -28,9 +28,9 @@ export default function ConfirmationModal({
   return (
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 z-10" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/50 z-10" />
         <Dialog.Content
-          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow z-10 w-1/3"
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow z-10 w-1/3"
         >
           <div className="flex flex-col">
             <Dialog.Title className="text-lg font-semibold text-muted m-0">{title}</Dialog.Title>
