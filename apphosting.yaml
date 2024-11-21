@@ -1,3 +1,7 @@
+# Settings for Cloud Run
+runConfig:
+  minInstances: 1
+
 # Environment variables and secrets
 env:
     # Get your OpenAI API Key here: https://platform.openai.com/account/api-keys
