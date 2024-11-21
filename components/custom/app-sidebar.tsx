@@ -36,6 +36,7 @@ export function AppSidebar({
   const searchParams = useSearchParams();
   const { setOpenMobile } = useSidebar();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const { isMobile, toggleSidebar } = useSidebar();
 
   useEffect(() => {
     const handleToastNotifications = (
@@ -113,6 +114,7 @@ export function AppSidebar({
             <Button variant="outline" className="mb-2 flex justify-start w-full" onClick={(event) => {
               event.preventDefault();
               event.stopPropagation();
+              if(isMobile) toggleSidebar();
               if (userRecord?.isGmailConnected ?? false) {
                 setIsModalOpen(true);
               } else {

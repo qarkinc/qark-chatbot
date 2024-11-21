@@ -18,6 +18,8 @@ import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
 import { Card, CardContent } from '../ui/card';
+import MessageCitations from './message-citations';
+import { DocumentSkeleton } from './document-skeleton';
 
 export type QarkMessage = Message & {
   citations?: Array<any>
@@ -146,52 +148,19 @@ export const PreviewMessage = ({
                 </div>
               )}
 
-              {(() => {
-                const _citations = citations[message.id]
-
-                if ((message.role === 'assistant' || message.role === 'system') && _citations && _citations.length > 0) {
-                  return (
-                    <>
-                      <h4 className='font-bold mt-3 text-xl'>Sources</h4>
-                      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 select-none'>
-                        {_citations.slice(0, 3).map((ele, idx) => {
-                          if (String(ele.subject).length === 0) return null;
-
-                          let mailLink;
-                          if (isDesktop) {
-                            mailLink = `https://mail.google.com/mail/u/0/#all/${ele.appMessageId}`;
-                          } else {
-                            mailLink = `https://mail.google.com/mail/mu/mp/#cv/All%20Mail/${ele.appMessageId}`;
-                          }
-
-                          return (
-                            <Link href={mailLink} key={`${ele.appMessageId}-${idx}`} target='_blank'>
-                              <Card className='p-2 size-full hover:bg-muted-foreground/30 bg-muted'>
-                                <span className='text-sm'>
-                                  {String(ele.subject).substring(0, 30)}...
-                                </span>
-                                <div className="flex text-xs items-center gap-1">
-                                  <LogoGMail />
-                                  <span>gmail</span>
-                                </div>
-                              </Card>
-                            </Link>
-                          )
-                        })}
-                        {_citations.length > 4 && (
-                          <Dialog.Trigger asChild>
-                            <Card className='p-2 hover:bg-muted-foreground/30 bg-muted size-full rounded-lg cursor-pointer select-none'>
-                              <span>More Sources</span>
-                            </Card>
-                          </Dialog.Trigger>
-                        )}
-                      </div>
-                    </>
-                  );
-                }
-
-                return null;
-              })()}
+              <MessageCitations
+                citations={citations[message.id]}
+                message={message}
+                isDesktop={isDesktop}
+                isLoading={isLoading}
+                content={(
+                  <Dialog.Trigger asChild>
+                    <Card className='p-2 hover:bg-muted-foreground/30 bg-muted size-full rounded-lg cursor-pointer select-none'>
+                      <span>More Sources</span>
+                    </Card>
+                  </Dialog.Trigger>
+                )}
+              />
 
               <MessageActions
                 key={`action-${message.id}`}
@@ -271,7 +240,7 @@ export const ThinkingMessage = () => {
 
         <div className="flex flex-col gap-2 w-full">
           <div className="flex flex-col gap-4 text-muted-foreground">
-            Thinking...
+            <DocumentSkeleton  />
           </div>
         </div>
       </div>
