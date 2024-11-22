@@ -20,10 +20,6 @@ export default function MessageCitations({
   isDesktop?: boolean
   isLoading?: boolean
 }) {
-  if (isLoading) return null;
-  if (message.role === 'user') return null;
-  if (citations.length === 0) return null;
-
   const renderCentiations = useCallback((ele: any, idx: number) => {
     if (String(ele.subject).length === 0) return null;
 
@@ -47,8 +43,9 @@ export default function MessageCitations({
         </Card>
       </Link>
     )
-  }, [isDesktop, citation]);
+  }, [isDesktop, citations]);
 
+  if (isLoading || message.role === 'user' || citations.length === 0) return null;
   return (
     <>
       <h4 className='font-bold mt-3 text-xl'>Sources</h4>
