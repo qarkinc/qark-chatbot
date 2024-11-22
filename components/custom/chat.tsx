@@ -46,16 +46,6 @@ export function Chat({
   } = useChat({
     body: { id, modelId: selectedModelId, userId: user?.id },
     initialMessages,
-    // TODO: Remove if we end up using server side oauth
-    // experimental_prepareRequestBody: (options) => {
-    //     return {
-    //       ...options.requestBody,
-    //       messages: options.messages,
-    //       requestBody: options.requestBody,
-    //       requestData: options.requestData,
-    //       "userToken": user?.googleAccessToken
-    //     } as any
-    // },
     onFinish: () => {
       mutate('/api/history');
     },

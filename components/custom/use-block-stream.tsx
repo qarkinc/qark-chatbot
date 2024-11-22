@@ -106,7 +106,10 @@ export function useBlockStream({
               return messages;
             });
           }, 0);
-          return draftBlock;
+          return {
+            ...draftBlock,
+            status: 'streaming'
+          };
         }
 
         case 'clear':
@@ -126,5 +129,5 @@ export function useBlockStream({
           return draftBlock;
       }
     });
-  }, [streamingData, setBlock, setCitations, setMessages]);
+  }, [streamingData, setBlock]);
 }
