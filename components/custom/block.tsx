@@ -90,7 +90,7 @@ export function Block({
     chatRequestOptions?: ChatRequestOptions
   ) => void;
 }) {
-  const [messagesContainerRef, messagesEndRef] =
+  const [messagesContainerRef, messagesTopRef] =
     useScrollToBottom<HTMLDivElement>();
 
   const {
@@ -296,6 +296,10 @@ export function Block({
               ref={messagesContainerRef}
               className="flex flex-col gap-4 h-full items-center overflow-y-scroll px-4 pt-20"
             >
+              <div
+                ref={messagesTopRef}
+                className="shrink-0 min-w-[24px] min-h-[24px]"
+              />
               {messages.map((message, index) => {
                 return (
                   <PreviewMessage
@@ -315,11 +319,6 @@ export function Block({
                   />
                 );
               })}
-
-              <div
-                ref={messagesEndRef}
-                className="shrink-0 min-w-[24px] min-h-[24px]"
-              />
             </div>
 
             <form className="flex flex-row gap-2 relative items-end w-full px-4 pb-4">
@@ -348,52 +347,52 @@ export function Block({
         initial={
           isMobile
             ? {
-                opacity: 0,
-                x: 0,
-                y: 0,
-                width: windowWidth,
-                height: windowHeight,
-                borderRadius: 50,
-              }
+              opacity: 0,
+              x: 0,
+              y: 0,
+              width: windowWidth,
+              height: windowHeight,
+              borderRadius: 50,
+            }
             : {
-                opacity: 0,
-                x: block.boundingBox.left,
-                y: block.boundingBox.top,
-                height: block.boundingBox.height,
-                width: block.boundingBox.width,
-                borderRadius: 50,
-              }
+              opacity: 0,
+              x: block.boundingBox.left,
+              y: block.boundingBox.top,
+              height: block.boundingBox.height,
+              width: block.boundingBox.width,
+              borderRadius: 50,
+            }
         }
         animate={
           isMobile
             ? {
-                opacity: 1,
-                x: 0,
-                y: 0,
-                width: windowWidth,
-                height: '100dvh',
-                borderRadius: 0,
-                transition: {
-                  delay: 0,
-                  type: 'spring',
-                  stiffness: 200,
-                  damping: 30,
-                },
-              }
+              opacity: 1,
+              x: 0,
+              y: 0,
+              width: windowWidth,
+              height: '100dvh',
+              borderRadius: 0,
+              transition: {
+                delay: 0,
+                type: 'spring',
+                stiffness: 200,
+                damping: 30,
+              },
+            }
             : {
-                opacity: 1,
-                x: 400,
-                y: 0,
-                height: windowHeight,
-                width: windowWidth ? windowWidth - 400 : 'calc(100dvw-400px)',
-                borderRadius: 0,
-                transition: {
-                  delay: 0,
-                  type: 'spring',
-                  stiffness: 200,
-                  damping: 30,
-                },
-              }
+              opacity: 1,
+              x: 400,
+              y: 0,
+              height: windowHeight,
+              width: windowWidth ? windowWidth - 400 : 'calc(100dvw-400px)',
+              borderRadius: 0,
+              transition: {
+                delay: 0,
+                type: 'spring',
+                stiffness: 200,
+                damping: 30,
+              },
+            }
         }
         exit={{
           opacity: 0,
