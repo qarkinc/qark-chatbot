@@ -6,6 +6,7 @@ import { ReactNode, useCallback } from "react";
 import { Card } from "../ui/card";
 import { LogoGMail } from "./icons";
 import { Skeleton } from "../ui/skeleton";
+import { TooltipTrigger, Tooltip, TooltipContent, BetterTooltip } from "../ui/tooltip";
 
 export default function MessageCitations({
   citations = [],
@@ -33,10 +34,10 @@ export default function MessageCitations({
     return (
       <Link href={mailLink} key={`${ele.appMessageId}-${idx}`} target='_blank'>
         <Card className='p-2 size-full hover:bg-muted-foreground/30 bg-muted'>
-          <span className='text-sm'>
-            {String(ele.subject).substring(0, 30)}...
+          <span className='text-sm text-ellipsis line-clamp-2 w-full'>
+            {ele.subject}
           </span>
-          <div className="flex text-xs items-center gap-1">
+          <div className="flex text-xs items-center gap-1 mt-3">
             <LogoGMail />
             <span>gmail</span>
           </div>

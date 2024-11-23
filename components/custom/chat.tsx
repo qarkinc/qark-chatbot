@@ -23,7 +23,7 @@ export function Chat({
   initialMessages,
   selectedModelId,
   user,
-  messageCitations={}
+  messageCitations = {}
 }: {
   id: string;
   initialMessages: Array<Message>;
@@ -68,14 +68,14 @@ export function Chat({
     },
   });
 
-  const [citations, setCitations] = useState<{[key: string]: Array<any>}>({ ...messageCitations });
+  const [citations, setCitations] = useState<{ [key: string]: Array<any> }>({ ...messageCitations });
 
   const { data: votes } = useSWR<Array<Vote>>(
     `/api/vote?chatId=${id}`,
     fetcher
   );
 
-  const [messagesContainerRef, messagesEndRef] =
+  const [messagesContainerRef, messagesTopRef] =
     useScrollToBottom<HTMLDivElement>();
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
@@ -89,6 +89,11 @@ export function Chat({
           className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4"
         >
           {messages.length === 0 && <Overview />}
+
+          <div
+            ref={messagesTopRef}
+            className="shrink-0 min-w-[24px] min-h-[24px]"
+          />
 
           {messages.map((message, index) => {
             return (
@@ -116,10 +121,7 @@ export function Chat({
               <ThinkingMessage />
             )}
 
-          <div
-            ref={messagesEndRef}
-            className="shrink-0 min-w-[24px] min-h-[24px]"
-          />
+
         </div>
         <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
           <MultimodalInput
