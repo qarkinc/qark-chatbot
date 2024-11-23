@@ -175,7 +175,7 @@ export const PreviewMessage = ({
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50 w-full z-10" />
           <Dialog.Content className="fixed top-0 right-0 h-full w-4/6 md:w-1/3 bg-sidebar shadow-lg p-6 z-50 rounded-ss-lg rounded-es-lg">
-            <Dialog.Title className='mb-2'>Sourcees</Dialog.Title>
+            <Dialog.Title className='mb-2'>Sources</Dialog.Title>
 
             {
               <div className='h-full overflow-y-auto'>
