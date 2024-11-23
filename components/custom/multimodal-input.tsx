@@ -23,17 +23,17 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { User } from '@/db/schema';
 
-const suggestedActions = [
-  {
-    title: 'What is my ',
-    label: 'schedule today?',
-    action: 'What is my schedule today?',
-  },
-  {
-    title: 'What is my last',
-    label: 'Amazon order return?',
-    action: 'What is my last Amazon order return?',
-  },
+const suggestedActions: Array<{ title: string; label: string; action: string }> = [
+  // {
+  //   title: 'What is my ',
+  //   label: 'schedule today?',
+  //   action: 'What is my schedule today?',
+  // },
+  // {
+  //   title: 'What is my last',
+  //   label: 'Amazon order return?',
+  //   action: 'What is my last Amazon order return?',
+  // },
 ];
 
 export function MultimodalInput({
