@@ -44,6 +44,7 @@ export function Chat({
     stop,
     data: streamingData,
   } = useChat({
+    api: process.env.NODE_ENV === 'development' ? "/api/chat" : "https://api.qarkx.com/api/chat",
     body: { id, modelId: selectedModelId, userId: user?.id },
     initialMessages,
     onFinish: () => {
@@ -79,7 +80,7 @@ export function Chat({
     useScrollToBottom<HTMLDivElement>();
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
-
+  console.log(`Rewrite destination: ${process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:8000' : 'https://api.qarkx.com'}`);
   return (
     <>
       <div className="flex flex-col min-w-0 h-dvh bg-background">
