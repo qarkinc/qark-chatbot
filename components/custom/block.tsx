@@ -90,7 +90,7 @@ export function Block({
     chatRequestOptions?: ChatRequestOptions
   ) => void;
 }) {
-  const [messagesContainerRef, messagesTopRef] =
+  const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
 
   const {
@@ -296,10 +296,6 @@ export function Block({
               ref={messagesContainerRef}
               className="flex flex-col gap-4 h-full items-center overflow-y-scroll px-4 pt-20"
             >
-              <div
-                ref={messagesTopRef}
-                className="shrink-0 min-w-[24px] min-h-[24px]"
-              />
               {messages.map((message, index) => {
                 return (
                   <PreviewMessage
@@ -319,6 +315,11 @@ export function Block({
                   />
                 );
               })}
+
+              <div
+                ref={messagesEndRef}
+                className="shrink-0 min-w-[24px] min-h-[24px]"
+              />
             </div>
 
             <form className="flex flex-row gap-2 relative items-end w-full px-4 pb-4">
