@@ -129,5 +129,5 @@ export function useBlockStream({
           return draftBlock;
       }
     });
-  }, [streamingData, setBlock]);
+  }, [streamingData, setBlock, setMessages, setCitations]);
 }
