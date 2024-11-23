@@ -44,7 +44,7 @@ export default function MessageCitations({
         </Card>
       </Link>
     )
-  }, [isDesktop, citations]);
+  }, [isDesktop]);
 
   if (isLoading || message.role === 'user' || citations.length === 0) return null;
   return (
