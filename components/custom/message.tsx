@@ -8,7 +8,7 @@ import { Message } from 'ai';
 import cx from 'classnames';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 
 import { UIBlock } from './block';
 import { DocumentToolCall, DocumentToolResult } from './document';
