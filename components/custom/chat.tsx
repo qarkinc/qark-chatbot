@@ -93,6 +93,9 @@ export function Chat({
 
 
           {messages.map((message, index) => {
+            if (message.role === "assistant") {
+              console.log(message.content);
+            }
             return (
               <PreviewMessage
                 key={message.id}
