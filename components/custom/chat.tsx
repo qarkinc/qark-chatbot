@@ -3,12 +3,12 @@
 import { Attachment, Message } from 'ai';
 import { useChat } from 'ai/react';
 import { AnimatePresence } from 'framer-motion';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { useWindowSize } from 'usehooks-ts';
 
 import { ChatHeader } from '@/components/custom/chat-header';
-import { PreviewMessage, QarkMessage, ThinkingMessage } from '@/components/custom/message';
+import { PreviewMessage, ThinkingMessage } from '@/components/custom/message';
 import { useScrollToBottom } from '@/components/custom/use-scroll-to-bottom';
 import { User, Vote } from '@/db/schema';
 import { fetcher } from '@/lib/utils';
@@ -165,7 +165,7 @@ export function Chat({
         )}
       </AnimatePresence>
 
-      <BlockStreamHandler streamingData={streamingData} setBlock={setBlock} setCitations={setCitations} setMessages={setMessages} />
+      <BlockStreamHandler streamingData={streamingData} setBlock={setBlock} setCitations={setCitations} />
     </>
   );
 }

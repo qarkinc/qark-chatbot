@@ -17,9 +17,10 @@ import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
 import { Weather } from './weather';
-import { Card, CardContent } from '../ui/card';
+import { Card } from '../ui/card';
 import MessageCitations from './message-citations';
 import { DocumentSkeleton } from './document-skeleton';
+import { getMessageIdFromAnnotations } from '@/lib/utils';
 
 export type QarkMessage = Message & {
   citations?: Array<any>
@@ -149,7 +150,7 @@ export const PreviewMessage = ({
               )}
 
               <MessageCitations
-                citations={citations[message.id]}
+                citations={citations[getMessageIdFromAnnotations(message)]}
                 message={message}
                 isDesktop={isDesktop}
                 isLoading={isLoading}
@@ -179,7 +180,7 @@ export const PreviewMessage = ({
 
             {
               <div className='h-full overflow-y-auto'>
-                {Array.from(citations[message?.id] ?? []).map((ele, idx) => {
+                {Array.from(citations[getMessageIdFromAnnotations(message)] ?? []).map((ele, idx) => {
                   if (String(ele.subject).trim().length === 0) return null;
 
                   let mailLink;
@@ -193,7 +194,7 @@ export const PreviewMessage = ({
                     <Link href={mailLink} key={`${ele.appMessageId}-${idx}`} target='_blank'>
                       <Card className='p-2 w-full border-muted hover:bg-muted-foreground/30 bg-muted mb-4'>
                         <span>{ele.subject}</span>
-                        <div className="flex text-xs w-full items-center gap-1">
+                        <div className="flex text-xs w-full items-center gap-1 mt-4">
                           <LogoGMail />
                           <span>gmail</span>
                         </div>
