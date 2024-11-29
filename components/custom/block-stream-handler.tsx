@@ -6,6 +6,7 @@ import { useBlockStream } from './use-block-stream';
 
 interface BlockStreamHandlerProps {
   setBlock: Dispatch<SetStateAction<UIBlock>>;
+  setMessages: Dispatch<SetStateAction<Message[]>>;
   setCitations: Dispatch<SetStateAction<{ [key: string]: Array<any> }>>;
   streamingData: JSONValue[] | undefined;
 }
@@ -13,11 +14,13 @@ interface BlockStreamHandlerProps {
 export function PureBlockStreamHandler({
   setBlock,
   setCitations,
+  setMessages,
   streamingData,
 }: BlockStreamHandlerProps) {
   useBlockStream({
     streamingData,
     setBlock,
+    setMessages,
     setCitations
   });
 

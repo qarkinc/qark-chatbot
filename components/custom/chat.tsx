@@ -168,7 +168,7 @@ export function Chat({
         )}
       </AnimatePresence>
 
-      <BlockStreamHandler streamingData={streamingData} setBlock={setBlock} setCitations={setCitations} />
+      <BlockStreamHandler streamingData={streamingData} setBlock={setBlock} setCitations={setCitations} setMessages={setMessages} />
     </>
   );
 }
