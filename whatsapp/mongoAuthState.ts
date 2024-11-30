@@ -6,63 +6,15 @@ import { Collection } from "mongodb";
 
 /* eslint-disable no-empty */
 const { proto } = require("@whiskeysockets/baileys/WAProto");
+const { initAuthCreds } = require("@whiskeysockets/baileys/lib/Utils/auth-utils");
 const {
   Curve,
   signedKeyPair,
 } = require("@whiskeysockets/baileys/lib/Utils/crypto");
 const {
-  generateRegistrationId,
+  generateRegistrationId, BufferJSON
 } = require("@whiskeysockets/baileys/lib/Utils/generics");
 const { randomBytes } = require("crypto");
-
-const initAuthCreds = () => {
-  const identityKey = Curve.generateKeyPair();
-  return {
-    noiseKey: Curve.generateKeyPair(),
-    signedIdentityKey: identityKey,
-    signedPreKey: signedKeyPair(identityKey, 1),
-    registrationId: generateRegistrationId(),
-    advSecretKey: randomBytes(32).toString("base64"),
-    processedHistoryMessages: [],
-    nextPreKeyId: 1,
-    firstUnuploadedPreKeyId: 1,
-    accountSettings: {
-      unarchiveChats: false,
-    },
-  };
-};
-
-const BufferJSON = {
-  replacer: (k, value) => {
-    if (
-      Buffer.isBuffer(value) ||
-      value instanceof Uint8Array ||
-      value?.type === "Buffer"
-    ) {
-      return {
-        type: "Buffer",
-        data: Buffer.from(value?.data || value).toString("base64"),
-      };
-    }
-
-    return value;
-  },
-
-  reviver: (_, value) => {
-    if (
-      typeof value === "object" &&
-      !!value &&
-      (value.buffer === true || value.type === "Buffer")
-    ) {
-      const val = value.data || value.value;
-      return typeof val === "string"
-        ? Buffer.from(val, "base64")
-        : Buffer.from(val || []);
-    }
-
-    return value;
-  },
-};
 
 // module.exports = useMongoDBAuthState = async (collection) => {
   export async function useMongoDBAuthState(collection: Collection) {
@@ -90,6 +42,7 @@ const BufferJSON = {
       await collection.deleteOne({ _id: id });
     } catch (_a) {}
   };
+  // const creds = (await readData("creds")) || initAuthCreds();
   const creds = (await readData("creds")) || initAuthCreds();
   return {
     state: {

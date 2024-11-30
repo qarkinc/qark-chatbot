@@ -1,10 +1,17 @@
 import { Collection, Db, MongoClient, OptionalId } from 'mongodb';
 import { Client as OpenSearchClient } from '@opensearch-project/opensearch';
 import { Boom } from '@hapi/boom';
+import readline from 'readline'
 
 import P from 'pino'
 const logger = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` }, P.destination('./wa-logs.txt'))
-import { 
+
+// Read line interface
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+const question = (text: string) => new Promise<string>((resolve) => rl.question(text, resolve))
+
+
+const { 
     DisconnectReason,
     makeWASocket,
     useMultiFileAuthState,
@@ -12,7 +19,8 @@ import {
     makeCacheableSignalKeyStore,
     makeInMemoryStore,
     proto,
-} from '../src'
+    Browsers,
+} = require("@whiskeysockets/baileys");
 import { useMongoDBAuthState } from './mongoAuthState';
 
 import { ObjectId } from 'mongodb';
@@ -35,8 +43,8 @@ const TIME_THRESHOLD = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
 
 
 const mongoClient = new MongoClient('mongodb://localhost:27017');
-const userDB = mongoClient.db('whatsapp').collection('users');
-// const store = makeInMemoryStore({})
+let userDB: Collection<any>;
+const store = makeInMemoryStore({})
 // store.readFromFile('./baileys_store_multi.json')
 // save every 10s
 // setInterval(() => {
@@ -82,6 +90,7 @@ async function main() {
     // Initialize collection references
     chunksCollection = db.collection('chunks');
     messagesCollection = db.collection('messages');
+    userDB = db.collection('users');
     
     // Start WhatsApp connection only after DB is ready
     await connectWhatsApp('saurabh', 'saurabh');
@@ -93,16 +102,13 @@ main().catch(console.error);
 
 
 // User Authentication Function
-async function authenticateUser(username, password) {
-    // TODO: implement authentication logic
+async function authenticateUser(username: string, password: string): Promise<{ state: any; saveCreds: () => Promise<void>; removeCreds: () => Promise<void> }> {
     const { state, saveCreds, removeCreds } = await useMongoDBAuthState(userDB);
-    // const { state, saveCreds } = await useMultiFileAuthState('./qark/credentials');
     return { state, saveCreds, removeCreds };
 }
 
 // Initialize Baileys and Connect to OpenSearch
-async function connectWhatsApp(username, password) {
-    // catch authentication error
+async function connectWhatsApp(username: string, password: string): Promise<void> {
     let state, saveCreds, removeCreds;
     try {
         ({ state, saveCreds, removeCreds } = await authenticateUser(username, password));
@@ -118,7 +124,8 @@ async function connectWhatsApp(username, password) {
 	const sock = makeWASocket({
 		version,
 		logger,
-		printQRInTerminal: true,
+		printQRInTerminal: false,
+		mobile: false,
 		auth: {
 			creds: state.creds,
 			/** caching makes the store faster to send/recv messages */
@@ -143,6 +150,17 @@ async function connectWhatsApp(username, password) {
         }
     })
 
+    store?.bind(sock.ev)
+    console.log('Sock Events:', sock.ev);
+
+    // Pairing code for Web clients
+	if(sock && !sock.authState.creds.registered) {
+		const phoneNumber: string = await question('Please enter your mobile phone number:\n')
+        console.log(`phone number: ${phoneNumber}`)
+		const code = await sock.requestPairingCode(phoneNumber)
+		console.log(`Pairing code: ${code}`)
+	}
+
     console.log('Sock Events:', sock.ev);
 
 
@@ -153,7 +171,6 @@ async function connectWhatsApp(username, password) {
 			if(events['creds.update']) {
 				await saveCreds()
 			}
-
 
             if(events['connection.update']) {
 				const update = events['connection.update']
@@ -274,7 +291,7 @@ async function connectWhatsApp(username, password) {
     )
 }
 
-async function processMessage(chatId, messageId, content, timestamp) {
+async function processMessage(chatId: string, messageId: string, content: string, timestamp: Date): Promise<void> {
     // Ensure collections are initialized
     if (!messagesCollection || !chunksCollection) {
         console.error('Database collections not initialized');
@@ -344,12 +361,20 @@ async function createCollectionsIfNotExist() {
     await db.createCollection('messages');
     console.log('Collection "messages" created.');
   }
+
+  if (!collectionNames.includes('users')) {
+    if (!db) {
+      throw new Error('Database not initialized');
+    }
+    await db.createCollection('users');
+    console.log('Collection "users" created.');
+  }
 }
 
 
 
 // Function to get or create a chunk based on chat ID, message content, and timestamp
-async function getOrCreateChunk(chatId, messageId, content, timestamp) {
+async function getOrCreateChunk(chatId: string, messageId: string, content: string, timestamp: Date): Promise<any> {
     const currentTime = timestamp.getTime();
     // 1. Try to find an existing chunk for the chat that can still accept more messages
     let chunk = await chunksCollection.findOne({
