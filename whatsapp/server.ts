@@ -18,8 +18,7 @@ const {
     fetchLatestBaileysVersion,
     makeCacheableSignalKeyStore,
     makeInMemoryStore,
-    proto,
-    Browsers,
+    IMessageKey,
 } = require("@whiskeysockets/baileys");
 import { useMongoDBAuthState } from './mongoAuthState';
 
@@ -139,7 +138,7 @@ async function connectWhatsApp(username: string, password: string): Promise<void
 		// implement to handle retries & poll updates
         syncFullHistory: true,
         shouldSyncHistoryMessage: () => true,
-        getMessage: async (key: proto.IMessageKey) => {
+        getMessage: async (key: typeof IMessageKey,) => {
             if (!key.id) return undefined;
             const message = await messagesCollection.findOne({ 'key.id': key.id });
             if (!message) return undefined;
@@ -166,7 +165,7 @@ async function connectWhatsApp(username: string, password: string): Promise<void
 
     sock.ev.process(
 		// events is a map for event name => event data
-		async(events) => {
+		async(events: any) => {
  			// credentials updated -- save them
 			if(events['creds.update']) {
 				await saveCreds()

@@ -16,9 +16,8 @@ const {
 } = require("@whiskeysockets/baileys/lib/Utils/generics");
 const { randomBytes } = require("crypto");
 
-// module.exports = useMongoDBAuthState = async (collection) => {
-  export async function useMongoDBAuthState(collection: Collection) {
-  const writeData = (data, id) => {
+export async function useMongoDBAuthState(collection: Collection) {
+  const writeData = (data: any, id: string) => {
     const informationToStore = JSON.parse(
       JSON.stringify(data, BufferJSON.replacer)
     );
@@ -48,10 +47,10 @@ const { randomBytes } = require("crypto");
     state: {
       creds,
       keys: {
-        get: async (type, ids) => {
-          const data = {};
+        get: async (type: string, ids: string[]) => {
+          const data: { [key: string]: any } = {};
           await Promise.all(
-            ids.map(async (id) => {
+            ids.map(async (id: string) => {
               let value = await readData(`${type}-${id}`);
               if (type === "app-state-sync-key") {
                 value = proto.Message.AppStateSyncKeyData.fromObject(data);
@@ -61,8 +60,8 @@ const { randomBytes } = require("crypto");
           );
           return data;
         },
-        set: async (data) => {
-          const tasks = [];
+        set: async (data: { [category: string]: { [id: string]: any } }) => {
+          const tasks: Promise<any>[] = [];
           for (const category of Object.keys(data)) {
             for (const id of Object.keys(data[category])) {
               const value = data[category][id];
@@ -78,8 +77,8 @@ const { randomBytes } = require("crypto");
         },
       },
     },
-    saveCreds: () => {
-      return writeData(creds, "creds");
+    saveCreds: async () => {
+      await writeData(creds, "creds");
     },
     removeCreds: () => {
       return removeData("creds");
