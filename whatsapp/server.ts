@@ -2,6 +2,7 @@ import { Collection, Db, MongoClient, OptionalId } from 'mongodb';
 import { Client as OpenSearchClient } from '@opensearch-project/opensearch';
 import { Boom } from '@hapi/boom';
 import readline from 'readline'
+import { logInfo, logError, logDebug } from '../utils/logger'; // Import the logger
 
 import P from 'pino'
 const logger = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` }, P.destination('./wa-logs.txt'))
@@ -9,7 +10,6 @@ const logger = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` }, P.dest
 // Read line interface
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 const question = (text: string) => new Promise<string>((resolve) => rl.question(text, resolve))
-
 
 const { 
     DisconnectReason,
@@ -34,13 +34,24 @@ const opensearchClient = new OpenSearchClient({
     }
 });
 
-console.log("Starting whatsapp server")
+logDebug("Qark:Starting whatsapp server")
 
+async function mysleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function logHello() {
+    while (true) {
+        logDebug("Qark:Heartbeat");
+        await mysleep(10000); // Sleep for 10 seconds
+    }
+}
+
+// Call the logHello function to start the loop
+logHello();
 
 const CHUNK_SIZE_LIMIT = 50; // Maximum messages per chunk
 const TIME_THRESHOLD = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
-
-
 
 const mongoClient = new MongoClient('mongodb://localhost:27017');
 let userDB: Collection<any>;
