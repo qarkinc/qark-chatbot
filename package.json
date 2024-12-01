@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "concurrently \"next dev --turbo\" \"node --inspect -r ts-node/register whatsapp/server.ts\"",
     "build": "next build",
     "start": "next start",
     "start-whatsapp-old": "ts-node whatsapp/server.ts",
@@ -34,6 +34,7 @@
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
+    "concurrently": "^9.1.0",
     "date-fns": "^4.1.0",
     "diff-match-patch": "^1.0.5",
     "dotenv": "^16.4.5",

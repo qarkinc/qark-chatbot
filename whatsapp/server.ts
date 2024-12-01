@@ -34,6 +34,7 @@ const opensearchClient = new OpenSearchClient({
     }
 });
 
+console.log("Starting whatsapp server")
 
 
 const CHUNK_SIZE_LIMIT = 50; // Maximum messages per chunk
@@ -155,9 +156,11 @@ async function connectWhatsApp(username: string, password: string): Promise<void
 
     // Pairing code for Web clients
 	if(sock && !sock.authState.creds.registered) {
-		const phoneNumber: string = await question('Please enter your mobile phone number:\n')
-        console.log(`phone number: ${phoneNumber}`)
-		const code = await sock.requestPairingCode(phoneNumber)
+		// const phoneNumber: string = await question('Please enter your mobile phone number:\n')
+        // console.log(`phone number: ${phoneNumber}`)
+        // add sleep of 5 seconds
+        await new Promise(resolve => setTimeout(resolve, 30000));
+		const code = await sock.requestPairingCode('14256289010')
 		console.log(`Pairing code: ${code}`)
 	}
 
