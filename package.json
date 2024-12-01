@@ -6,7 +6,8 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "start-whatsapp": "ts-node whatsapp/server.ts",
+    "start-whatsapp-old": "ts-node whatsapp/server.ts",
+    "start-whatsapp": "node --inspect -r ts-node/register whatsapp/server.ts",
     "lint": "next lint"
   },
   "dependencies": {
@@ -45,6 +46,7 @@
     "next": "15.0.3-canary.2",
     "next-auth": "5.0.0-beta.25",
     "next-themes": "^0.3.0",
+    "node": "^20.18.1",
     "orderedmap": "^2.1.1",
     "pino": "^7.0.0",
     "postgres": "^3.4.4",

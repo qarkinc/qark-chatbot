@@ -102,7 +102,8 @@ main().catch(console.error);
 
 // User Authentication Function
 async function authenticateUser(username: string, password: string): Promise<{ state: any; saveCreds: () => Promise<void>; removeCreds: () => Promise<void> }> {
-    const { state, saveCreds, removeCreds } = await useMongoDBAuthState(userDB);
+    // const { state, saveCreds, removeCreds } = await useMongoDBAuthState(userDB);
+    const { state, saveCreds, removeCreds } = await useMultiFileAuthState('./whatsapp/credentials')
     return { state, saveCreds, removeCreds };
 }
 
