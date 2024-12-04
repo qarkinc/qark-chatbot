@@ -17,6 +17,7 @@ import {
   vote,
   Citation,
   citation,
+  userWhatsappTokens,
 } from './schema';
 
 // Optionally, if not using email/pass login, you can
@@ -32,6 +33,14 @@ export async function getUser(email: string): Promise<Array<User>> {
     console.error('Failed to get user from database');
     throw error;
   }
+}
+
+export async function getUserTokens(userId: string) {
+  return await db.select()
+    .from(userWhatsappTokens)
+    .where(eq(userWhatsappTokens.userId, userId))
+    .orderBy(desc(userWhatsappTokens.createdOn))
+    .limit(1) ?? [];
 }
 
 export async function getUserById(userId: string): Promise<Array<User>> {

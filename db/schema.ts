@@ -25,6 +25,16 @@ export const user = pgTable('User', {
 
 export type User = InferSelectModel<typeof user>;
 
+export const userWhatsappTokens = pgTable("UserWhatsappTokens", {
+  userId: uuid("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  whatsappToken: json("whatsappToken"),
+  createdOn: timestamp("createdOn", { mode:"date" }).notNull().defaultNow()
+});
+
+export type UserWhatsappTokens = InferSelectModel<typeof userWhatsappTokens>;
+
 export const chat = pgTable('Chat', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   createdAt: timestamp('createdAt').notNull(),

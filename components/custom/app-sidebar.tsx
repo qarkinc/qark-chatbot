@@ -124,7 +124,15 @@ export function AppSidebar({
               <LogoGMail size={44} />
               <span >{(userRecord?.isGmailConnected ?? false) ? "Unlink" : "Link"} Gmail</span>
             </Button>
-            <Button variant="outline" className="flex justify-start" onClick={() => toast.warning("Will be available soon")}>
+            <Button variant="outline" className="flex justify-start" 
+              onClick={() => {
+                if (currentUser) {
+                  router.push(`connect-whatsapp?userId=${currentUser.id}`);
+                } else {
+                  toast.info("Please login first before linking any account with QARK")
+                }
+              }}
+              >
               <LogoWhatsapp size={44} />
               <span >Link Whatsapp</span>
             </Button>

@@ -10,10 +10,10 @@ export const experimental_ppr = true;
 
 export default async function Layout({
   children,
-  connect,
+  modal,
 }: {
   children: React.ReactNode,
-  connect: React.ReactNode,
+  modal: React.ReactNode,
 }) {
   const [session, cookieStore] = await Promise.all([auth(), cookies()]);
   const isCollapsed = cookieStore.get('sidebar:state')?.value !== 'true';
@@ -29,7 +29,7 @@ export default async function Layout({
       <AppSidebar currentUser={session?.user} userRecord={userRecord} />
       <SidebarInset>
         {children}
-        {/* {connect} */}
+        {modal}
       </SidebarInset>
     </SidebarProvider>
   );

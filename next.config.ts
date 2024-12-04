@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  webpack: (config) => {
+    config.resolve.mainFields = ["browser", "module", "main"];
+    return config;
+  },
 };
 
 export default nextConfig;
