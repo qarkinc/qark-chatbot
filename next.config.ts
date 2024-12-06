@@ -12,6 +12,23 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // headers: async () => {
+  //   return [
+  //     {
+  //       source: "/api/chat",
+  //       headers: [
+  //         {
+  //           "key": "Content-Type",
+  //           "value": "text/event-stream"
+  //         },
+  //         {
+  //           key: "Connection",
+  //           value: "keep-alive"
+  //         }
+  //       ]
+  //     }
+  //   ];
+  // },
   rewrites: async () => {
     return [
       {

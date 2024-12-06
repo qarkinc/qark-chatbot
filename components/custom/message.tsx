@@ -187,7 +187,7 @@ export const PreviewMessage = ({
                   if (isDesktop) {
                     mailLink = `https://mail.google.com/mail/u/0/#all/${ele.appMessageId}`;
                   } else {
-                    mailLink = `https://mail.google.com/mail/mu/mp/#cv/All%20Mail/${ele.appMessageId}`;
+                    mailLink = `https://mail.google.com/mail/mu/mp/#cv/All%20Mail/${ele.appThreadId ? ele.appThreadId : ele.appMessageId}`;
                   }
 
                   return (
