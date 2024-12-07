@@ -150,7 +150,7 @@ export const PreviewMessage = ({
               )}
 
               <MessageCitations
-                citations={citations[getMessageIdFromAnnotations(message)]}
+                citations={citations[message.id]}
                 message={message}
                 isDesktop={isDesktop}
                 isLoading={isLoading}
@@ -180,14 +180,14 @@ export const PreviewMessage = ({
 
             {
               <div className='h-full overflow-y-auto'>
-                {Array.from(citations[getMessageIdFromAnnotations(message)] ?? []).map((ele, idx) => {
+                {Array.from(citations[message?.id] ?? []).map((ele, idx) => {
                   if (String(ele.subject).trim().length === 0) return null;
 
                   let mailLink;
                   if (isDesktop) {
                     mailLink = `https://mail.google.com/mail/u/0/#all/${ele.appMessageId}`;
                   } else {
-                    mailLink = `https://mail.google.com/mail/mu/mp/#cv/All%20Mail/${ele.appMessageId}`;
+                    mailLink = `https://mail.google.com/mail/mu/mp/#cv/All%20Mail/${ele.appThreadId ? ele.appThreadId : ele.appMessageId}`;
                   }
 
                   return (

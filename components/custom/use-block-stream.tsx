@@ -14,10 +14,12 @@ type StreamingDelta = {
 export function useBlockStream({
   streamingData,
   setBlock,
+  setMessages,
   setCitations
 }: {
   streamingData: JSONValue[] | undefined;
   setBlock: Dispatch<SetStateAction<UIBlock>>;
+  setMessages: Dispatch<SetStateAction<Message[]>>;
   setCitations: Dispatch<SetStateAction<{ [key: string]: Array<any> }>>;
 }) {
   const { mutate } = useSWRConfig();
@@ -98,6 +100,12 @@ export function useBlockStream({
                 }
               }
             });
+
+            setMessages((messages) => {
+              messages[messages.length - 1].id = draftBlock.documentId;
+              return messages;
+            });
+
           }, 0);
           return {
             ...draftBlock,
@@ -122,5 +130,5 @@ export function useBlockStream({
           return draftBlock;
       }
     });
-  }, [streamingData, setBlock, setCitations]);
+  }, [streamingData, setBlock, setMessages, setCitations]);
 }

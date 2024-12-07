@@ -63,6 +63,7 @@ export const citation = pgTable("Citation", {
 	messageId: uuid().notNull(),
 	appMessageId: varchar().notNull(),
 	subject: varchar().notNull(),
+  appThreadId: varchar(),
 	createdAt: timestamp({ mode: 'string' }).notNull(),
 },
 (table) => {

@@ -30,11 +30,11 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 .env.production
+.env
+.env*.local
 
 # turbo
 .turbo
 
-.env
 .vercel
 .vscode
-.env*.local

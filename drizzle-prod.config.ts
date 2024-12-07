@@ -1,11 +1,9 @@
 import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
 
-config({path: "./.env.dev.local"});
-if (!process.env.POSTGRES_URL) {
-  throw new Error("POSTGRES_URL is not defined");
-}
-console.log(`POSTGRES_URL is: ${process.env.POSTGRES_URL}`);
+config({
+  path: ".env.production.local",
+});
 
 export default defineConfig({
   schema: "./db/schema.ts",
