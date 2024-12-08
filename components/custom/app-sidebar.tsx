@@ -24,6 +24,11 @@ import { User as pgUser } from '@/db/schema';
 
 import ConfirmationModal from './confirmation-modal';
 
+// Function to handle authorize logic
+export const handleGmailAuthorize = () => {
+  const url = `${window.location.origin}/api/google_auth/authorize`;
+  window.open(url, "_blank", "noopener,noreferrer");
+};
 
 export function AppSidebar({
   currentUser,
@@ -66,12 +71,6 @@ export function AppSidebar({
   // Function to handle revoke-access logic
   const handleRevokeAccess = () => {
     const url = `${window.location.origin}/api/google_auth/revoke-access`;
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
-  // Function to handle authorize logic
-  const handleAuthorize = () => {
-    const url = `${window.location.origin}/api/google_auth/authorize`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
@@ -118,7 +117,7 @@ export function AppSidebar({
               if (userRecord?.isGmailConnected ?? false) {
                 setIsModalOpen(true);
               } else {
-                handleAuthorize();
+                handleGmailAuthorize();
               }
             }}>
               <LogoGMail size={44} />
@@ -143,14 +142,16 @@ export function AppSidebar({
           )}
         </SidebarFooter>
       </Sidebar>
+
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         message="Do you want to proceed with unlinking Gmail?"
         yesBtnText="Proceed"
         noBtnText="Cancel"
-        isAcceptedCallback={(isAccpted) => {
-          if (isAccpted) {
+        buttonType="danger"
+        isAcceptedCallback={(isAccepted) => {
+          if (isAccepted) {
             handleRevokeAccess();
           }
           setIsModalOpen(false);

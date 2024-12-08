@@ -3,7 +3,7 @@
 import { Attachment, Message } from 'ai';
 import { useChat } from 'ai/react';
 import { AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { useWindowSize } from 'usehooks-ts';
 
@@ -17,6 +17,8 @@ import { Block, UIBlock } from './block';
 import { BlockStreamHandler } from './block-stream-handler';
 import { MultimodalInput } from './multimodal-input';
 import { Overview } from './overview';
+import ConfirmationModal from './confirmation-modal';
+import { handleGmailAuthorize } from './app-sidebar';
 
 export function Chat({
   id,
@@ -35,6 +37,7 @@ export function Chat({
 
   const {
     messages,
+    error,
     setMessages,
     handleSubmit,
     input,
@@ -69,6 +72,25 @@ export function Chat({
     },
   });
 
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
+
+  const [errorTitle, setErrorTitle] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  // React to changes in the `error` variable
+  useEffect(() => {
+    if (error) {
+      if (error.message === "1001") {
+        setErrorTitle("Relink your Gmail");
+        setErrorMessage("Your Gmail token expired because sometimes Google can invalidate your token. Please relink your Gmail now to avoid service interruption.");
+      } else {
+        setErrorTitle("Error Occurred");
+        setErrorMessage("Please contact the Qark team at info@qarkx.com");
+      }
+      setIsErrorModalOpen(true); // Open modal if there's an error
+    }
+  }, [error]); // Trigger this effect when `error` changes
+  
   const [citations, setCitations] = useState<{ [key: string]: Array<any> }>({ ...messageCitations });
 
   const { data: votes } = useSWR<Array<Vote>>(
@@ -114,6 +136,22 @@ export function Chat({
               />
             )
           })}
+
+          <ConfirmationModal
+            isOpen={isErrorModalOpen}
+            onClose={() => setIsErrorModalOpen(false)}
+            title={errorTitle}
+            message={errorMessage}
+            yesBtnText="Proceed"
+            buttonType="primary"
+            needNoBtn={false}
+            isAcceptedCallback={(isAccepted) => {
+              if (isAccepted) {
+                handleGmailAuthorize();
+              }
+              setIsErrorModalOpen(false);
+            }}
+          />
 
           {isLoading &&
             messages.length > 0 &&
