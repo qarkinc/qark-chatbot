@@ -80,14 +80,12 @@ export function Chat({
   // React to changes in the `error` variable
   useEffect(() => {
     if (error) {
+      console.log(`Error in chat: ${error}, error message: ${error.message}`)
       if (error.message === "1001") {
         setErrorTitle("Relink your Gmail");
         setErrorMessage("Your Gmail token expired because sometimes Google can invalidate your token. Please relink your Gmail now to avoid service interruption.");
-      } else {
-        setErrorTitle("Error Occurred");
-        setErrorMessage("Please contact the Qark team at info@qarkx.com");
+        setIsErrorModalOpen(true); // Open modal if there's an error
       }
-      setIsErrorModalOpen(true); // Open modal if there's an error
     }
   }, [error]); // Trigger this effect when `error` changes
   
