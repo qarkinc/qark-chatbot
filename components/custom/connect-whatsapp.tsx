@@ -23,8 +23,10 @@ export default function ConnectWhatsapp({
   const [phoneNumber, setPhoneNumber] = useState<any>("");
   const [pairingCode, setPairingCode] = useState<string | null>(null);
   const [isActive, setIsActive] = useState<boolean>(false);
+  const [loader, setLoader] = useState<boolean>(false);
 
   useEffect(() => {
+    return;
     if (!isActive) return;
     const endTime = Date.now() + (5 * 60 * 1000); // 5 minutes from now
     let intervalId: NodeJS.Timeout;
@@ -69,23 +71,35 @@ export default function ConnectWhatsapp({
 
   const requestPairingCode = async () => {
     try {
+      console.log(phoneNumber.replace(/\D/g, ""));
+      setLoader(true);
       const apiResponse = await fetch("/api/whatsapp_auth", {
         method: "POST",
         signal: AbortSignal.timeout(2 * 60 * 1000),
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-          userPhoneNumber: phoneNumber,
-          db_userId: searchParams.get("userId")
+          phoneNumber: phoneNumber.replace(/\D/g, ""),
+          userId: searchParams.get("userId")
         })
       });
       const response = await apiResponse.json();
+      console.log(response);
+      
       if (response["status"] && response["pairing_code"] !== null) {
         setPairingCode(response["pairing_code"]);
+        setLoader(false);
         setIsActive(true);
       } else {
-
+        setLoader(false);
+        toast.error("Something went wrong!! Please try again");
+        handleClose();
+        return;
       }
 
     } catch (ex) {
+      setLoader(false);
       toast.error("Something went wrong!! Please try again");
       handleClose();
     }
@@ -172,7 +186,12 @@ export default function ConnectWhatsapp({
             <CardFooter>
               <div className="flex w-full items-end justify-end gap-4">
                 <Button variant={"ghost"} className="text-red-700 hover:bg-red-400 " onClick={handleClose}>Cancel</Button>
-                <Button disabled={phoneNumber === undefined || phoneNumber === ""} onClick={requestPairingCode}>
+                <Button disabled={phoneNumber === undefined || phoneNumber === "" || loader} onClick={requestPairingCode}>
+                  {loader && (
+                    <div className="animate-spin tex-white">
+                      <LoaderIcon />
+                    </div>
+                  )}
                   Request Code
                 </Button>
               </div>

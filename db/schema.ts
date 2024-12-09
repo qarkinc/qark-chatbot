@@ -10,6 +10,9 @@ import {
   foreignKey,
   boolean,
   jsonb,
+  integer,
+  index,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('User', {
@@ -25,15 +28,62 @@ export const user = pgTable('User', {
 
 export type User = InferSelectModel<typeof user>;
 
-export const userWhatsappTokens = pgTable("UserWhatsappTokens", {
-  userId: uuid("userId")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  whatsappToken: json("whatsappToken"),
-  createdOn: timestamp("createdOn", { mode:"date" }).notNull().defaultNow()
+export const accounts = pgTable("Accounts", {
+  user_id: uuid("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  app_user_id: varchar("app_user_id").notNull(),
+  provider: integer("provider").notNull().default(1),
+  app_user_phone_number: varchar("app_user_phone_number"),
+  account_linking_status: integer("account_linking_status"),
+  created_on: timestamp("created_on", { mode: "date" }).notNull().defaultNow(),
+}, (table) => {
+  return {
+    account_id: primaryKey({ 
+      name: "account_id_pk",
+      columns: [table.user_id, table.app_user_id, table.provider],
+    }),
+    user_id_index: index("user_id_idx").on(table.user_id, table.app_user_id, table.provider),
+    user_phone_index: index("user_phone_index").on(table.user_id, table.app_user_phone_number, table.provider),
+  }
 });
 
-export type UserWhatsappTokens = InferSelectModel<typeof userWhatsappTokens>;
+export type Accounts = InferSelectModel<typeof accounts>;
+
+export const tokens = pgTable("Tokens", {
+  user_id: uuid("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  app_user_id: varchar("app_user_id").notNull(),
+  provider: integer("provider").notNull().default(1),
+  token: json<any>("token"),
+  keyname: varchar("keyname"),
+  created_on: timestamp("created_on", { mode: "date" }),
+}, (table) => {
+  return {
+    account_id: foreignKey({
+      name: "account_id_fk",
+      columns: [table.user_id, table.app_user_id, table.provider],
+      foreignColumns: [accounts.user_id, accounts.app_user_id, accounts.provider],
+    }).onDelete("cascade"),
+    keyname_index: uniqueIndex("keyname_index").on(table.user_id, table.app_user_id, table.provider, table.keyname),
+    account_id_index: uniqueIndex("account_id_index").on(table.user_id, table.app_user_id, table.provider),
+  }
+});
+
+export type Tokens = InferSelectModel<typeof tokens>;
+
+export const contacts = pgTable("Contacts", {
+  user_id: uuid("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  app_user_id: varchar("app_user_id").notNull(),
+  provider: integer("provider").notNull().default(1),
+  contact_jid: varchar("contact_jid"),
+  contact_name: varchar("contact_name"),
+  contact_phone_no: varchar("contact_phone_no"),
+  other_contact_info: json("other_contact_info"),
+  created_on: timestamp("created_on", { mode: "date" })
+}, (table) => ({
+  "user_contact_index": index("user_contact_index").on(table.user_id, table.app_user_id, table.provider),
+  "unique_index": uniqueIndex("contact_index").on(table.user_id, table.app_user_id, table.provider, table.contact_jid)
+}));
+
+export type Contacts = InferSelectModel<typeof contacts>;
 
 export const chat = pgTable('Chat', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),

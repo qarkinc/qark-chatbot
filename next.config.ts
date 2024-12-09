@@ -37,6 +37,12 @@ const nextConfig: NextConfig = {
             ? 'http://127.0.0.1:8000/api/chat'
             : 'https://api.qarkx.com/api/chat',
       },
+      {
+        source: '/api/whatsapp_auth/:endpoint*',
+        destination: process.env.NODE_ENV === 'development'
+            ? 'http://127.0.0.1:8080/api/whatsapp_auth/:endpoint*'
+            : 'https://api.qarkx.com/api/whatsapp_auth/:endpoint*',
+      },
     ]
   },
   webpack: (config) => {

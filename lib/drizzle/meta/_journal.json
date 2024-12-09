@@ -43,6 +43,20 @@
       "when": 1733450544029,
       "tag": "0005_unusual_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1733731523416,
+      "tag": "0006_chief_chronomancer",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1733753804084,
+      "tag": "0007_smart_swarm",
+      "breakpoints": true
     }
   ]
 }
