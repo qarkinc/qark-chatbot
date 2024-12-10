@@ -52,18 +52,22 @@ export const tokens = pgTable("Tokens", {
   user_id: uuid("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   app_user_id: varchar("app_user_id").notNull(),
   provider: integer("provider").notNull().default(1),
-  token: json<any>("token"),
+  token: varchar("token"),
   keyname: varchar("keyname"),
   created_on: timestamp("created_on", { mode: "date" }),
 }, (table) => {
   return {
+    token_pk: primaryKey({
+      name: "token_table_pk",
+      columns: [table.user_id, table.app_user_id, table.provider, table.keyname]
+    }),
     account_id: foreignKey({
       name: "account_id_fk",
       columns: [table.user_id, table.app_user_id, table.provider],
       foreignColumns: [accounts.user_id, accounts.app_user_id, accounts.provider],
     }).onDelete("cascade"),
     keyname_index: uniqueIndex("keyname_index").on(table.user_id, table.app_user_id, table.provider, table.keyname),
-    account_id_index: uniqueIndex("account_id_index").on(table.user_id, table.app_user_id, table.provider),
+    // account_id_index: uniqueIndex("account_id_index").on(table.user_id, table.app_user_id, table.provider),
   }
 });
 
