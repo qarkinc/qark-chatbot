@@ -4,12 +4,13 @@ import { CircleX, Cog, CogIcon, EllipsisVertical, EllipsisVerticalIcon } from "l
 import { Button } from "../ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "../ui/card";
 import PhoneNumberInput from "react-phone-number-input";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import 'react-phone-number-input/style.css'
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { LoaderIcon } from "./icons";
+import { POLLING_INTERVAL, REQUEST_END_TIME } from "@/lib/variables";
 
 export type ConnectWhatsappProps = {
   handleClose: () => void
@@ -25,10 +26,22 @@ export default function ConnectWhatsapp({
   const [isActive, setIsActive] = useState<boolean>(false);
   const [loader, setLoader] = useState<boolean>(false);
 
+  const userCancelController = useMemo(() => new AbortController(), []);
+  const timoutSignal = AbortSignal.timeout(2 * 60 * 1000);
+  const requestCombinedSignal = AbortSignal.any([
+    userCancelController.signal,
+    timoutSignal
+  ])
+
+  const closeModal = useCallback(() => {
+    userCancelController.abort();
+    handleClose();
+  }, [handleClose, userCancelController])
+
   useEffect(() => {
-    return;
+    // return;
     if (!isActive) return;
-    const endTime = Date.now() + (5 * 60 * 1000); // 5 minutes from now
+    const endTime = Date.now() + (REQUEST_END_TIME * 60 * 1000); // 5 minutes from now
     let intervalId: NodeJS.Timeout;
 
     intervalId = setInterval(async () => {
@@ -36,38 +49,53 @@ export default function ConnectWhatsapp({
         if (Date.now() >= endTime) {
           clearInterval(intervalId);
           setIsActive(false);
-          handleClose();
+          closeModal();
         }
 
         const apiResponse = await fetch("/api/whatsapp_auth/check_status", {
           method: "POST",
-          signal: AbortSignal.timeout(5 * 60 * 1000),
+          signal: requestCombinedSignal,
+          headers: {
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify({
-            "userPhoneNumber": phoneNumber ?? "",
-            db_userId: searchParams.get("userId")
+            "phoneNumber": phoneNumber.replace(/\D/g, "") ?? "",
+            "userId": searchParams.get("userId")
           })
         });
         const response = await apiResponse.json();
 
-        if (response["status"] === "CONNECTED") {
-          toast.success("Whatsapp Linked Successfully...");
+        if (response["qark_code"] !== "ACCOUNT_NOT_FOUND" && response["qark_code"] !== "INVALID") {
+          if (response["qark_code"] === "ACCOUNT_LINKING_SUCCESS") {
+            toast.success("Whatsapp Linked Successfully...");
+            clearInterval(intervalId);
+            closeModal()
+          } else if (response["qark_code"] === "ACCOUNT_LINKING_FAILED") {
+            toast.error("Whatsapp Linking Failed. Please Try again");
+            clearInterval(intervalId);
+            closeModal()
+          }
+        } else {
+          toast.error("Something went wrong!!");
           clearInterval(intervalId);
-          handleClose();
-        } else if (response["status"] === "FAILED") {
-          toast.error("Whatsapp Linking Failed. Please Try again");
-          clearInterval(intervalId);
-          handleClose();
+          closeModal()
         }
+
       } catch (ex) {
+        console.log(ex);
+        
         toast.error("Something went wrong!! Please try again");
         clearInterval(intervalId);
-        handleClose()
+        closeModal()
       }
-    }, 300);
+    }, POLLING_INTERVAL);
 
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(intervalId);
+      closeModal()
+    };
 
-  }, [handleClose, isActive, phoneNumber, searchParams])
+  }, [closeModal, isActive, phoneNumber, searchParams, requestCombinedSignal])
 
   const requestPairingCode = async () => {
     try {
@@ -75,7 +103,7 @@ export default function ConnectWhatsapp({
       setLoader(true);
       const apiResponse = await fetch("/api/whatsapp_auth", {
         method: "POST",
-        signal: AbortSignal.timeout(2 * 60 * 1000),
+        signal: requestCombinedSignal,
         headers: {
           "Content-Type": "application/json"
         },
@@ -86,22 +114,22 @@ export default function ConnectWhatsapp({
       });
       const response = await apiResponse.json();
       console.log(response);
-      
-      if (response["status"] && response["pairing_code"] !== null) {
+
+      if (response["status"] && response["pairing_code"] !== null && response["pairing_code"] !== undefined) {
         setPairingCode(response["pairing_code"]);
         setLoader(false);
         setIsActive(true);
       } else {
         setLoader(false);
         toast.error("Something went wrong!! Please try again");
-        handleClose();
+        closeModal();
         return;
       }
 
     } catch (ex) {
       setLoader(false);
       toast.error("Something went wrong!! Please try again");
-      handleClose();
+      closeModal();
     }
   }
 
@@ -113,7 +141,7 @@ export default function ConnectWhatsapp({
             <CardHeader>
               <div className="flex w-full justify-between items-center">
                 <h3 className="font-bold text-2xl">Enter code on phone</h3>
-                <CircleX className="text-2xl cursor-pointer" onClick={handleClose} />
+                <CircleX className="text-2xl cursor-pointer" onClick={closeModal} />
               </div>
             </CardHeader>
             <CardContent>
@@ -152,7 +180,7 @@ export default function ConnectWhatsapp({
             </CardContent>
             <CardFooter>
               <div className="flex w-full items-end justify-end gap-4">
-                <Button variant={"ghost"} className="text-red-700 hover:bg-red-400 " onClick={handleClose}>Cancel</Button>
+                <Button variant={"ghost"} className="text-red-700 hover:bg-red-400 " onClick={closeModal}>Cancel</Button>
                 <Button disabled>
                   <div className="animate-spin tex-white">
                     <LoaderIcon />

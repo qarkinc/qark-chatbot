@@ -1,17 +1,11 @@
-// import { WASocket } from "@whiskeysockets/baileys";
 
-import EventEmitter from "events";
+export enum QarkAPICode {
+  ACCOUNT_NOT_FOUND = "ACCOUNT_NOT_FOUND",
+  INVALID = "INVALID",
+  ACCOUNT_IN_PROGRESS = "IN_PROGRESS",
+  ACCOUNT_LINKING_SUCCESS = "ACCOUNT_LINKING_SUCCESS",
+  ACCOUNT_LINKING_FAILED = "ACCOUNT_LINKING_FAILED"
+}
 
-// let socket: WASocket;
-
-// export function getSocket(): WASocket {
-//   return socket;
-// }
-
-// export function setSocket(_socket: WASocket) {
-//   console.log(">>> Updating Socket Variable....");
-  
-//   socket = _socket;
-// }
-
-export const socketEventEmitter: EventEmitter = new EventEmitter();
+export const POLLING_INTERVAL: number = 5000;
+export const REQUEST_END_TIME: number = 5; // Number of minutes

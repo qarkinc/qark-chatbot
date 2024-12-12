@@ -52,7 +52,7 @@ export const tokens = pgTable("Tokens", {
   user_id: uuid("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   app_user_id: varchar("app_user_id").notNull(),
   provider: integer("provider").notNull().default(1),
-  token: varchar("token"),
+  token: jsonb("token"),
   keyname: varchar("keyname"),
   created_on: timestamp("created_on", { mode: "date" }),
 }, (table) => {
