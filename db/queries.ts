@@ -17,6 +17,7 @@ import {
   vote,
   Citation,
   citation,
+  accounts,
 } from './schema';
 
 // Optionally, if not using email/pass login, you can
@@ -55,10 +56,6 @@ export async function createUser(email: string, password: string) {
   }
 }
 
-// db.insert(accounts).values({
-
-// })
-
 export async function updateUser<T extends Partial<User>>(user_id: string, updatedUserRecord: T) {
   try {
     return await db.update(user)
@@ -67,6 +64,17 @@ export async function updateUser<T extends Partial<User>>(user_id: string, updat
       .returning();
   } catch (error) {
     console.error('Failed to create user in database');
+    throw error;
+  }
+}
+
+export async function getUserAccounts(user_id: string) {
+  try {
+    return await db.select().from(accounts).where(
+      eq(accounts.user_id, user_id)
+    ).orderBy(desc(accounts.provider));
+  } catch (error) {
+    console.error('Failed to fetched user\'s accounts from database', error);
     throw error;
   }
 }

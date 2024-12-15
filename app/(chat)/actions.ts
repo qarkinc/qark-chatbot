@@ -4,6 +4,7 @@ import { CoreMessage, CoreUserMessage, generateText } from 'ai';
 import { cookies } from 'next/headers';
 
 import { customModel } from '@/ai';
+import { getUserAccounts } from '@/db/queries';
 
 export async function saveModelId(model: string) {
   const cookieStore = await cookies();
@@ -26,4 +27,8 @@ export async function generateTitleFromUserMessage({
   });
 
   return title;
+}
+
+export async function getUserAccountsFromDB(userId: string) {
+  return await getUserAccounts(userId);
 }

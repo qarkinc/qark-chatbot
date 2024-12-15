@@ -1,22 +1,28 @@
 "use client";
 
-import { auth } from "@/app/(auth)/auth";
 import ConnectWhatsapp from "@/components/custom/connect-whatsapp";
 import * as Dialog from "@radix-ui/react-dialog";
 import { clsx } from "clsx";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 export default function Page() {
   const router = useRouter()
+  const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState<boolean>(true);
-  const [userId, setUserId] = useState<string | null>(null);
 
   const handleClose = () => {
     router.back();
     setIsOpen(false)
   }
+
+  useEffect(() => {
+    if (searchParams.size === 0 || !searchParams.has("userId") || searchParams.get("userId")?.length === 0) {
+      setIsOpen(false);
+      router.back();
+      return;
+    }
+  }, [router, searchParams])
 
   return (
     <Dialog.Root defaultOpen={true} open={isOpen} onOpenChange={handleClose}>

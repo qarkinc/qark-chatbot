@@ -7,5 +7,16 @@ export enum QarkAPICode {
   ACCOUNT_LINKING_FAILED = "ACCOUNT_LINKING_FAILED"
 }
 
+export enum QarkAccountLinkingStatus {
+  ACCOUNT_IN_PROGRESS = 1,
+  ACCOUNT_LINKING_SUCCESS = 2,
+  ACCOUNT_LINKING_FAILED = 3
+}
+
 export const POLLING_INTERVAL: number = 5000;
 export const REQUEST_END_TIME: number = 5; // Number of minutes
+
+export enum QarkAccountProviders {
+  GMAIL = 1,
+  WHATSAPP = 2
+}

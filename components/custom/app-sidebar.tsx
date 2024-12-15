@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type User } from 'next-auth';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { LogoGMail, LogoWhatsapp, PlusIcon } from '@/components/custom/icons';
@@ -20,9 +20,12 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { BetterTooltip } from '@/components/ui/tooltip';
-import { User as pgUser } from '@/db/schema';
+import { Accounts, User as pgUser } from '@/db/schema';
 
 import ConfirmationModal from './confirmation-modal';
+import { QarkAccountLinkingStatus, QarkAccountProviders } from '@/lib/variables';
+import { LoaderIcon } from 'lucide-react';
+import { getUserAccountsFromDB } from '@/app/(chat)/actions';
 
 
 export function AppSidebar({
@@ -37,6 +40,33 @@ export function AppSidebar({
   const { setOpenMobile } = useSidebar();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { isMobile, toggleSidebar } = useSidebar();
+
+  const [isWhatsappConnected, setIsWhatsappConnected] = useState<boolean>(false);
+  const [activeUserWhatsappAccount, setActiveUserWhatsappAccount] = useState<Accounts | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [dialogContent, setDialogContent] = useState<{
+    title?: string,
+    message: string,
+    callbackRef: () => void,
+    yesBtnText?: string,
+    noBtnText?: string,
+  }>({
+    message: "Do you want to proceed with unlinking Gmail?",
+    yesBtnText: "Proceed",
+    noBtnText: "Cancel",
+    callbackRef: () => console.log("Default Callback")
+  });
+
+  const checkWhatsappLinkingStatus = useCallback(async () => {
+    const userAccounts = await getUserAccountsFromDB(currentUser!.id!);
+    const accountIdx = userAccounts.findIndex((ele) => ele.user_id === currentUser?.id && ele.provider === QarkAccountProviders.WHATSAPP);
+    if (accountIdx !== -1) {
+      const userAccount = Object.assign({}, { ...userAccounts[accountIdx] });
+      setIsWhatsappConnected(userAccount.account_linking_status === QarkAccountLinkingStatus.ACCOUNT_LINKING_SUCCESS);
+      setActiveUserWhatsappAccount({ ...userAccount })
+    }
+  }, [currentUser])
 
   useEffect(() => {
     const handleToastNotifications = (
@@ -61,7 +91,8 @@ export function AppSidebar({
     // Handle notifications for authorization and revoke-access
     handleToastNotifications("authorization_status", "Gmail linked successfully!", "Gmail linking failed. Please try again.");
     handleToastNotifications("revoke_access_status", "Gmail unlinked successfully!", "Failed to unlink Gmail access. Please try again.");
-  }, [router, searchParams]);
+    checkWhatsappLinkingStatus();
+  }, [checkWhatsappLinkingStatus, router, searchParams]);
 
   // Function to handle revoke-access logic
   const handleRevokeAccess = () => {
@@ -74,6 +105,50 @@ export function AppSidebar({
     const url = `${window.location.origin}/api/google_auth/authorize`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
+
+  const handleWhatsappUnlink = async () => {
+    try {
+      setIsLoading(true);
+      const apiReponse = await fetch("/api/whatsapp_auth/unlink", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          userId: activeUserWhatsappAccount?.user_id,
+          phoneNumber: activeUserWhatsappAccount?.app_user_id
+        })
+      });
+
+      if (apiReponse.ok) {
+        // const response = await apiReponse.json();
+        toast.success("Whatsapp unlinking is successfull")
+        setIsLoading(false);
+        router.replace("/");
+        checkWhatsappLinkingStatus();
+      } else {
+        toast.error("Something went wrong")
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      
+      setIsLoading(false);
+      toast.error("Something went wrong")
+    }
+  }
+
+  const openConfirmationModal = ({ title = "Confirm Action", message, callbackRef }: {
+    title?: string,
+    message: string,
+    callbackRef: () => void,
+  }) => {
+    setDialogContent((prev) => ({
+      ...prev,
+      message: message,
+      title,
+      callbackRef
+    }));
+    setIsModalOpen(true);
+  }
 
   return (
     <>
@@ -114,27 +189,49 @@ export function AppSidebar({
             <Button variant="outline" className="mb-2 flex justify-start w-full" onClick={(event) => {
               event.preventDefault();
               event.stopPropagation();
-              if(isMobile) toggleSidebar();
-              if (userRecord?.isGmailConnected ?? false) {
-                setIsModalOpen(true);
+              if (isMobile) toggleSidebar();
+              if (currentUser) {
+                if (userRecord?.isGmailConnected ?? false) {
+                  openConfirmationModal({
+                    message: "Do you want to proceed with unlinking Gmail?",
+                    callbackRef: handleRevokeAccess
+                  });
+                } else {
+                  handleAuthorize();
+                }
               } else {
-                handleAuthorize();
+                toast.info("Please login first before linking any account with QARK")
               }
             }}>
               <LogoGMail size={44} />
-              <span >{(userRecord?.isGmailConnected ?? false) ? "Unlink" : "Link"} Gmail</span>
+              <span>{(userRecord?.isGmailConnected ?? false) ? "Unlink" : "Link"} Gmail</span>
             </Button>
-            <Button variant="outline" className="flex justify-start" 
-              onClick={() => {
+            <Button variant="outline" className="flex justify-start items-center"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (isMobile) toggleSidebar();
                 if (currentUser) {
-                  router.push(`connect-whatsapp?userId=${currentUser.id}`);
+                  if (isWhatsappConnected) {
+                    openConfirmationModal({
+                      message: "Do you want to proceed with unlinking Whatapp?",
+                      callbackRef: handleWhatsappUnlink
+                    })
+                  } else {
+                    router.push(`connect-whatsapp?userId=${currentUser.id}`);
+                  }
                 } else {
                   toast.info("Please login first before linking any account with QARK")
                 }
               }}
-              >
+            >
               <LogoWhatsapp size={44} />
-              <span >Link Whatsapp</span>
+              <span className="flex-1 text-start">{isWhatsappConnected ? "Unlink" : "Link"} Whatsapp</span>
+              {isLoading && (
+                <div className="animate-spin tex-white self-center">
+                  <LoaderIcon />
+                </div>
+              )}
             </Button>
           </SidebarGroup>
           <SidebarGroup>
@@ -154,12 +251,13 @@ export function AppSidebar({
       <ConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        message="Do you want to proceed with unlinking Gmail?"
-        yesBtnText="Proceed"
-        noBtnText="Cancel"
+        title={dialogContent.title}
+        message={dialogContent?.message ?? "Do you really want to do this action?"}
+        yesBtnText={dialogContent?.yesBtnText ?? "Proceed"}
+        noBtnText={dialogContent?.noBtnText ?? "Cancel"}
         isAcceptedCallback={(isAccpted) => {
           if (isAccpted) {
-            handleRevokeAccess();
+            dialogContent.callbackRef();
           }
           setIsModalOpen(false);
         }}
