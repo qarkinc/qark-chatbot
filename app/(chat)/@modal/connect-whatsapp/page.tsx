@@ -12,7 +12,9 @@ export default function Page() {
   const [isOpen, setIsOpen] = useState<boolean>(true);
 
   const handleClose = () => {
-    router.back();
+    const returnUrl = searchParams.get("returnUrl") ?? "/";
+    router.replace(returnUrl);
+    
     setIsOpen(false)
   }
 

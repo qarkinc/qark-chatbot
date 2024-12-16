@@ -122,7 +122,7 @@ export function AppSidebar({
         // const response = await apiReponse.json();
         toast.success("Whatsapp unlinking is successfull")
         setIsLoading(false);
-        router.replace("/");
+        window.location.reload()
         checkWhatsappLinkingStatus();
       } else {
         toast.error("Something went wrong")
@@ -218,7 +218,11 @@ export function AppSidebar({
                       callbackRef: handleWhatsappUnlink
                     })
                   } else {
-                    router.push(`connect-whatsapp?userId=${currentUser.id}`);
+                    const url = new URL("connect-whatsapp", window.location.origin);
+                    url.searchParams.set("userId", currentUser.id!);
+                    url.searchParams.set("returnUrl", window.location.href);
+
+                    router.push(url.toString());
                   }
                 } else {
                   toast.info("Please login first before linking any account with QARK")
