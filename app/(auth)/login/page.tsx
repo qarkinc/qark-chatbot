@@ -9,6 +9,8 @@ import { AuthForm } from '@/components/custom/auth-form';
 import { SubmitButton } from '@/components/custom/submit-button';
 
 import { login, LoginActionState } from '../actions';
+import { Button } from '@/components/ui/button';
+import { signIn } from 'next-auth/react';
 
 export default function Page() {
   const router = useRouter();
@@ -50,6 +52,9 @@ export default function Page() {
         </div>
         <AuthForm action={handleSubmit} defaultEmail={email} isAccountCreation={false}>
           <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
+          <Button type="button" onClick={() => signIn("google")}>
+            Sign In with Google
+          </Button>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
             {"Don't have an account? "}
             <Link

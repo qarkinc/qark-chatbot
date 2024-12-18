@@ -51,6 +51,8 @@ export const login = async (
       };
     }
 
+    console.log(error);
+    
     return { status: "failed" };
   }
 };
@@ -97,7 +99,8 @@ export const register = async (
         errors: error.errors.map(err => err.message)
       };
     }
-
+    console.log(error);
+    
     return { status: "failed" };
   }
 };
